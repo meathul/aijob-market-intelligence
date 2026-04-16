@@ -1,0 +1,107 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options directory
+.vs/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Rider
+.idea/
+*.sln.iml
+.idea/**
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Local History for Visual Studio
+.localhistory/
+
+# Visual Studio settings
+.VisualStudioVersion
+.vs
+
+# BDD Specflow specific
+*.feature.cs
+*.feature.xlsx.*
+*.Specs_*.html
+
+# ReSharper is a .NET coding add-in
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Installed packages
+packages/
+.packages/
+
+# Persistence
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode
+.idea
+*.swp
+*.swo
+*~
+*.sublime-workspace
+*.sublime-project
+
+# Test coverage
+coverage/
+*.coverage
+opencover/
+codecoverage/
+
+# Application Insights
+ApplicationInsights.config
+bin/Debug/net*/*.ApplicationInsights.config
+
+# Local database files
+*.mdf
+*.ldf
+*.ndf
+
+# Backup Files
+*.bak
+
+# NuGet
+nuget.exe
+.nuget/
+
+# node_modules (if any frontend dependencies)
+node_modules/
+
+# Build artifacts
+artifacts/
+dist/
