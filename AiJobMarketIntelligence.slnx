@@ -1,18 +1,19 @@
 <Solution>
-  <Folder Name="/src/" />
-  <Folder Name="/src/Api/">
-    <Project Path="src/Api/AiJobMarketIntelligence.Api/AiJobMarketIntelligence.Api.csproj" />
+  <Folder Name="/api/" />
+  <Folder Name="/api/src/" />
+  <Folder Name="/api/src/Api/">
+    <Project Path="api/src/Api/AiJobMarketIntelligence.Api/AiJobMarketIntelligence.Api.csproj" />
   </Folder>
-  <Folder Name="/src/Application/">
-    <Project Path="src/Application/AiJobMarketIntelligence.Application/AiJobMarketIntelligence.Application.csproj" />
+  <Folder Name="/api/src/Application/">
+    <Project Path="api/src/Application/AiJobMarketIntelligence.Application/AiJobMarketIntelligence.Application.csproj" />
   </Folder>
-  <Folder Name="/src/Domain/">
-    <Project Path="src/Domain/AiJobMarketIntelligence.Domain/AiJobMarketIntelligence.Domain.csproj" />
+  <Folder Name="/api/src/Domain/">
+    <Project Path="api/src/Domain/AiJobMarketIntelligence.Domain/AiJobMarketIntelligence.Domain.csproj" />
   </Folder>
-  <Folder Name="/src/Infrastructure/">
-    <Project Path="src/Infrastructure/AiJobMarketIntelligence.Infrastructure/AiJobMarketIntelligence.Infrastructure.csproj" />
+  <Folder Name="/api/src/Infrastructure/">
+    <Project Path="api/src/Infrastructure/AiJobMarketIntelligence.Infrastructure/AiJobMarketIntelligence.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/src/Worker/">
-    <Project Path="src/Worker/AiJobMarketIntelligence.Worker/AiJobMarketIntelligence.Worker.csproj" />
+  <Folder Name="/api/src/Worker/">
+    <Project Path="api/src/Worker/AiJobMarketIntelligence.Worker/AiJobMarketIntelligence.Worker.csproj" />
   </Folder>
 </Solution>
