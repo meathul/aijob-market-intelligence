@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using AiJobMarketIntelligence.Domain.Entities;
-using AiJobMarketIntelligence.Infrastructure.Repositories;
+using AiJobMarketIntelligence.Application.Interfaces.Repositories;
 using AiJobMarketIntelligence.Application.Services.Providers;
 
 namespace AiJobMarketIntelligence.Application.Services;

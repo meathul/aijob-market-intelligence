@@ -4,6 +4,7 @@ using AiJobMarketIntelligence.Infrastructure.Data;
 using AiJobMarketIntelligence.Infrastructure.Repositories;
 using AiJobMarketIntelligence.Application.Services;
 using AiJobMarketIntelligence.Application.Services.Providers;
+using AiJobMarketIntelligence.Application.Interfaces.Repositories;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -15,7 +16,7 @@ builder.Services.AddDbContext<AiJobContext>(options =>
     options.UseSqlite(connectionString,
         sqliteOptions => sqliteOptions.MigrationsAssembly("AiJobMarketIntelligence.Infrastructure")));
 
-// Register repositories
+// Register repositories (Infrastructure implementations for Application interfaces)
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<ISkillRepository, SkillRepository>();
 

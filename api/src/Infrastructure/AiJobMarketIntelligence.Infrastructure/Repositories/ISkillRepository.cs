@@ -1,29 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using AiJobMarketIntelligence.Domain.Entities;
 using AiJobMarketIntelligence.Infrastructure.Data;
+using AiJobMarketIntelligence.Application.Interfaces.Repositories;
 
 namespace AiJobMarketIntelligence.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository for Skill entities.
 /// </summary>
-public interface ISkillRepository
-{
-    Task<Skill?> GetByIdAsync(int id);
-    
-    Task<Skill?> GetByNameAsync(string name);
-    
-    Task<List<Skill>> GetAllAsync();
-    
-    Task AddAsync(Skill skill);
-    
-    Task AddRangeAsync(IEnumerable<Skill> skills);
-    
-    Task SaveAsync();
-    
-    Task<bool> ExistsByNameAsync(string name);
-}
-
 public class SkillRepository : ISkillRepository
 {
     private readonly AiJobContext _context;

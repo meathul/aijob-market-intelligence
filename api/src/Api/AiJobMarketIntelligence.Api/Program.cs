@@ -3,6 +3,8 @@ using AiJobMarketIntelligence.Infrastructure.Data;
 using AiJobMarketIntelligence.Infrastructure.Repositories;
 using AiJobMarketIntelligence.Application.Services;
 using AiJobMarketIntelligence.Application.Services.Providers;
+using AiJobMarketIntelligence.Application.Interfaces.Repositories;
+using AiJobMarketIntelligence.Application.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,9 +21,12 @@ builder.Services.AddDbContext<AiJobContext>(options =>
     options.UseSqlite(connectionString,
         sqliteOptions => sqliteOptions.MigrationsAssembly("AiJobMarketIntelligence.Infrastructure")));
 
-// Register repositories
+// Register repositories (Infrastructure implementations for Application interfaces)
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<ISkillRepository, SkillRepository>();
+
+// Register job query service
+builder.Services.AddScoped<IJobQueryService, JobQueryService>();
 
 // Register Adzuna provider (real job data from free Adzuna API)
 builder.Services.AddScoped<AdzunaJobProvider>();

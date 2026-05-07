@@ -1,36 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using AiJobMarketIntelligence.Domain.Entities;
 using AiJobMarketIntelligence.Infrastructure.Data;
+using AiJobMarketIntelligence.Application.Interfaces.Repositories;
 
 namespace AiJobMarketIntelligence.Infrastructure.Repositories;
 
-/// <summary>
-/// Repository for JobRaw entities with common database operations.
-/// </summary>
-public interface IJobRepository
-{
-    Task<JobRaw?> GetByIdAsync(int id);
-    
-    Task<JobRaw?> GetByUrlAsync(string url);
-    
-    Task<List<JobRaw>> GetAllAsync(int pageNumber, int pageSize);
-    
-    Task<List<JobRaw>> SearchAsync(string keyword, string? location, int pageNumber, int pageSize);
-    
-    Task<List<JobRaw>> GetUnprocessedAsync();
-    
-    Task AddAsync(JobRaw job);
-    
-    Task AddRangeAsync(IEnumerable<JobRaw> jobs);
-    
-    Task UpdateAsync(JobRaw job);
-    
-    Task SaveAsync();
-    
-    Task<int> CountAsync();
-    
-    Task<bool> ExistsByUrlAsync(string url);
-}
+// Interface moved to Application layer: AiJobMarketIntelligence.Application.Interfaces.Repositories.IJobRepository
 
 public class JobRepository : IJobRepository
 {

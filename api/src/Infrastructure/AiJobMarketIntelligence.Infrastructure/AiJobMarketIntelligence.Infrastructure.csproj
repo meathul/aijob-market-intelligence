@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Domain\AiJobMarketIntelligence.Domain\AiJobMarketIntelligence.Domain.csproj" />
+    <ProjectReference Include="..\..\Application\AiJobMarketIntelligence.Application\AiJobMarketIntelligence.Application.csproj" />
   </ItemGroup>
 
 </Project>
