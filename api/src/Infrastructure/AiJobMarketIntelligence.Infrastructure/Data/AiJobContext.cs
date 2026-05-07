@@ -56,16 +56,20 @@ public class AiJobContext : DbContext
                 .IsRequired()
                 .HasMaxLength(2000);
 
-            // Unique constraint on URL to prevent duplicates
+            // MySQL note: a UNIQUE index on a utf8mb4(2000) column exceeds key length.
+            // Enforce de-dupe at application-level and via a prefix unique index.
             entity.HasIndex(e => e.Url)
                 .IsUnique()
-                .HasDatabaseName("IX_JobsRaw_Url_Unique");
+                .HasDatabaseName("IX_JobsRaw_Url_Unique")
+                .HasPrefixLength(191);
 
             entity.Property(e => e.PostedDate)
                 .IsRequired();
 
             entity.Property(e => e.CreatedAt)
                 .IsRequired()
+                // MySQL: use TIMESTAMP so DEFAULT CURRENT_TIMESTAMP is allowed under strict mode
+                .HasColumnType("timestamp")
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.Property(e => e.IsProcessed)
@@ -153,8 +157,9 @@ public class AiJobContext : DbContext
                 .HasForeignKey(js => js.SkillId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            entity.ToTable("JobSkills", t => 
-                t.HasCheckConstraint("CK_JobSkill_Ids", "[JobRawId] > 0 AND [SkillId] > 0"));
+            // Provider-safe check constraint (MySQL-compatible identifiers)
+            entity.ToTable("JobSkills", t =>
+                t.HasCheckConstraint("CK_JobSkill_Ids", "JobRawId > 0 AND SkillId > 0"));
         });
     }
 }

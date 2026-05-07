@@ -54,13 +54,15 @@ public class JobQueryService : IJobQueryService
         if (string.IsNullOrWhiteSpace(keyword) && string.IsNullOrWhiteSpace(location))
             throw new ArgumentException("At least keyword or location must be provided");
 
-        _logger.LogInformation("Searching jobs - Keyword: {Keyword}, Location: {Location}, Page: {PageNumber}", keyword, location, pageNumber);
+        _logger.LogInformation(
+            "Searching jobs - Keyword: {Keyword}, Location: {Location}, Page: {PageNumber}",
+            keyword,
+            location,
+            pageNumber);
 
+        // Repository handles null/empty filtering consistently.
         var jobs = await _jobRepository.SearchAsync(keyword ?? string.Empty, location, pageNumber, pageSize);
-
-        // TODO: add CountSearchAsync(...) in repository for efficiency.
-        var allMatches = await _jobRepository.SearchAsync(keyword ?? string.Empty, location, 1, int.MaxValue);
-        var totalCount = allMatches.Count;
+        var totalCount = await _jobRepository.CountSearchAsync(keyword, location);
 
         return new JobSearchResultDto
         {

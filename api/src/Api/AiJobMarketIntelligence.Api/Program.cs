@@ -10,16 +10,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 
-// Configure Entity Framework Core with SQL Server
+// Configure Entity Framework Core with MySQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<AiJobContext>(options =>
-    options.UseSqlite(connectionString,
-        sqliteOptions => sqliteOptions.MigrationsAssembly("AiJobMarketIntelligence.Infrastructure")));
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString),
+        mySqlOptions => mySqlOptions.MigrationsAssembly("AiJobMarketIntelligence.Infrastructure")));
 
 // Register repositories (Infrastructure implementations for Application interfaces)
 builder.Services.AddScoped<IJobRepository, JobRepository>();
@@ -66,7 +67,6 @@ if (app.Environment.IsDevelopment())
         await SeedDatabaseAsync(dbContext);
     }
 
-    app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
