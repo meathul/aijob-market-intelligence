@@ -98,15 +98,15 @@ This document provides guidance for developers working on the AI Job Market Inte
 4. **Create Migration**
    ```bash
    dotnet ef migrations add AddJobAnalytics \
-       --project src/Infrastructure/AiJobMarketIntelligence.Infrastructure \
-       --startup-project src/Api/AiJobMarketIntelligence.Api
+       --project api/src/Infrastructure/AiJobMarketIntelligence.Infrastructure \
+       --startup-project api/src/Api/AiJobMarketIntelligence.Api
    ```
 
 5. **Apply Migration**
    ```bash
    dotnet ef database update \
-       --project src/Infrastructure/AiJobMarketIntelligence.Infrastructure \
-       --startup-project src/Api/AiJobMarketIntelligence.Api
+       --project api/src/Infrastructure/AiJobMarketIntelligence.Infrastructure \
+       --startup-project api/src/Api/AiJobMarketIntelligence.Api
    ```
 
 ## 🧪 Testing Approach
@@ -309,16 +309,16 @@ ENTRYPOINT ["dotnet", "AiJobMarketIntelligence.Api.dll"]
 ### EF Core Commands
 ```bash
 # Create migration
-dotnet ef migrations add MigrationName --project src/Infrastructure --startup-project src/Api
+dotnet ef migrations add MigrationName --project api/src/Infrastructure --startup-project api/src/Api
 
 # Update database
-dotnet ef database update --project src/Infrastructure --startup-project src/Api
+dotnet ef database update --project api/src/Infrastructure --startup-project api/src/Api
 
 # Remove last migration
-dotnet ef migrations remove --project src/Infrastructure --startup-project src/Api
+dotnet ef migrations remove --project api/src/Infrastructure --startup-project api/src/Api
 
 # Generate SQL script
-dotnet ef migrations script --project src/Infrastructure --startup-project src/Api -o script.sql
+dotnet ef migrations script --project api/src/Infrastructure --startup-project api/src/Api -o script.sql
 ```
 
 ### Build & Run
@@ -327,10 +327,10 @@ dotnet ef migrations script --project src/Infrastructure --startup-project src/A
 dotnet build
 
 # Run API
-dotnet run --project src/Api/AiJobMarketIntelligence.Api
+dotnet run --project api/src/Api/AiJobMarketIntelligence.Api
 
 # Run Worker
-dotnet run --project src/Worker/AiJobMarketIntelligence.Worker
+dotnet run --project api/src/Worker/AiJobMarketIntelligence.Worker
 
 # Run tests
 dotnet test
@@ -349,7 +349,7 @@ Add `.vscode/launch.json`:
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceFolder}/src/Api/AiJobMarketIntelligence.Api/bin/Debug/net10.0/AiJobMarketIntelligence.Api.dll",
+      "program": "${workspaceFolder}/api/src/Api/AiJobMarketIntelligence.Api/bin/Debug/net10.0/AiJobMarketIntelligence.Api.dll",
       "args": [],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,

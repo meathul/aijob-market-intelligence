@@ -26,7 +26,7 @@ sqlcmd -S . -E -Q "SELECT @@VERSION;"
 
 ```bash
 cd /path/to/project
-ls -la  # Should show src/, README.md, etc.
+ls -la  # Should show api/, ui/, README.md, etc.
 ```
 
 ### 2. Update Database Connection String
@@ -77,8 +77,8 @@ Build succeeded. 0 Warning(s), 0 Error(s)
 ```bash
 # From project root
 dotnet ef database update \
-  --project src/Infrastructure/AiJobMarketIntelligence.Infrastructure \
-  --startup-project src/Api/AiJobMarketIntelligence.Api
+  --project api/src/Infrastructure/AiJobMarketIntelligence.Infrastructure \
+  --startup-project api/src/Api/AiJobMarketIntelligence.Api
 ```
 
 On first run, this will:
@@ -89,7 +89,7 @@ On first run, this will:
 ### 6. Run the API
 
 ```bash
-dotnet run --project src/Api/AiJobMarketIntelligence.Api
+dotnet run --project api/src/Api/AiJobMarketIntelligence.Api
 ```
 
 Output:
@@ -103,7 +103,7 @@ info: Microsoft.Hosting.Lifetime[14]
 
 In a separate terminal:
 ```bash
-dotnet run --project src/Worker/AiJobMarketIntelligence.Worker
+dotnet run --project api/src/Worker/AiJobMarketIntelligence.Worker
 ```
 
 Output:
@@ -394,8 +394,8 @@ builder.Services.AddDbContext<AiJobContext>(options =>
 ### Create Migration Script
 
 ```bash
-dotnet ef migrations script --project src/Infrastructure \
-  --startup-project src/Api \
+dotnet ef migrations script --project api/src/Infrastructure \
+  --startup-project api/src/Api \
   --output migration.sql
 ```
 
@@ -456,13 +456,13 @@ sqlcmd -S . -E -Q "SELECT 1"        # Windows
 **Migration Fails**
 ```bash
 # Check migrations exist
-dotnet ef migrations list --project src/Infrastructure
+dotnet ef migrations list --project api/src/Infrastructure
 
 # Remove bad migration
-dotnet ef migrations remove --project src/Infrastructure
+dotnet ef migrations remove --project api/src/Infrastructure
 
 # Recreate
-dotnet ef migrations add FixedMigration --project src/Infrastructure
+dotnet ef migrations add FixedMigration --project api/src/Infrastructure
 ```
 
 **Port Already in Use**
@@ -479,6 +479,6 @@ taskkill /PID <PID> /F  # Windows
 ## 📞 Support
 
 For issues:
-1. Check the logs: `dotnet run --project src/Api`
+1. Check the logs: `dotnet run --project api/src/Api`
 2. Review [Development Guide](./DEVELOPMENT.md)
 3. Check [README.md](./README.md)

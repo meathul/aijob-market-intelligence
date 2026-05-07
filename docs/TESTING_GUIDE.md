@@ -4,8 +4,8 @@
 
 ### Start the API
 ```bash
-cd /Users/athulkrishnagopakumar/Desktop/Aijob
-dotnet run --project src/Api/AiJobMarketIntelligence.Api
+cd /Users/athulkrishnagopakumar/project/Aijob
+dotnet run --project api/src/Api/AiJobMarketIntelligence.Api
 ```
 
 The API will be available at `http://localhost:5062`
@@ -107,7 +107,7 @@ Response to Client
 ## Data Storage
 
 **Database**: SQLite (File-based)
-- **Location**: `src/Api/AiJobMarketIntelligence.Api/AiJobMarketIntelligence.db`
+- **Location**: `api/src/Api/AiJobMarketIntelligence.Api/AiJobMarketIntelligence.db`
 - **No setup required** - database is automatically created on first run
 - **Schema**: 4 tables (JobRaw, JobProcessed, Skill, JobSkill)
 
@@ -118,7 +118,7 @@ Response to Client
 The system includes an independent background worker that automatically fetches jobs every 30 minutes:
 
 ```bash
-dotnet run --project src/Worker/AiJobMarketIntelligence.Worker
+dotnet run --project api/src/Worker/AiJobMarketIntelligence.Worker
 ```
 
 **Features**:
@@ -189,7 +189,7 @@ dotnet run --project src/Worker/AiJobMarketIntelligence.Worker
 ### No jobs appear after fetch
 1. Check if external APIs are accessible: `curl https://remotive.io/api/remote-jobs`
 2. If blocked, system will use demo data (this is expected)
-3. Verify database file exists: `ls src/Api/AiJobMarketIntelligence.Api/AiJobMarketIntelligence.db`
+3. Verify database file exists: `ls api/src/Api/AiJobMarketIntelligence.Api/AiJobMarketIntelligence.db`
 
 ### Port already in use
 ```bash

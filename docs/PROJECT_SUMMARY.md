@@ -120,12 +120,20 @@ This is a **production-ready starter project** for the **AI Job Market Intellige
 ### 11. Project Structure ✓
 ```
 AiJobMarketIntelligence/
-├── src/
-│   ├── Domain/                     (Entities, interfaces)
-│   ├── Infrastructure/             (DbContext, Repositories, Migrations)
-│   ├── Application/                (Services, DTOs, Providers)
-│   ├── Api/                        (Controllers, Program.cs, config)
-│   └── Worker/                     (Background service)
+├── docs/
+├── api/
+│   ├── src/
+│   │   ├── Domain/
+│   │   ├── Infrastructure/
+│   │   ├── Application/
+│   │   ├── Api/
+│   │   └── Worker/
+│   └── tests/
+│       ├── UnitTests/
+│       └── IntegrationTests/
+├── ui/
+│   ├── src/
+│   └── tests/
 ├── README.md
 ├── DEVELOPMENT.md
 ├── INSTALLATION.md
@@ -180,11 +188,11 @@ The project is **immediately runnable**:
 ```bash
 # 1. Apply database migration
 dotnet ef database update \
-  --project src/Infrastructure/AiJobMarketIntelligence.Infrastructure \
-  --startup-project src/Api/AiJobMarketIntelligence.Api
+  --project api/src/Infrastructure/AiJobMarketIntelligence.Infrastructure \
+  --startup-project api/src/Api/AiJobMarketIntelligence.Api
 
 # 2. Run API
-dotnet run --project src/Api/AiJobMarketIntelligence.Api
+dotnet run --project api/src/Api/AiJobMarketIntelligence.Api
 
 # 3. Access at https://localhost:7001
 # Swagger UI: https://localhost:7001/swagger

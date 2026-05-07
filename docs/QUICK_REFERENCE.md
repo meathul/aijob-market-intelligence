@@ -4,18 +4,18 @@
 
 ```bash
 # 1. Navigate to project
-cd /Users/athulkrishnagopakumar/Desktop/Aijob
+cd /Users/athulkrishnagopakumar/project/Aijob
 
 # 2. Update connection string (if needed)
-# Edit: src/Api/AiJobMarketIntelligence.Api/appsettings.json
+# Edit: api/src/Api/AiJobMarketIntelligence.Api/appsettings.json
 
 # 3. Apply database migration
 dotnet ef database update \
-  --project src/Infrastructure/AiJobMarketIntelligence.Infrastructure \
-  --startup-project src/Api/AiJobMarketIntelligence.Api
+  --project api/src/Infrastructure/AiJobMarketIntelligence.Infrastructure \
+  --startup-project api/src/Api/AiJobMarketIntelligence.Api
 
 # 4. Run API
-dotnet run --project src/Api/AiJobMarketIntelligence.Api
+dotnet run --project api/src/Api/AiJobMarketIntelligence.Api
 
 # 5. Open browser
 # https://localhost:7001/swagger
@@ -24,12 +24,12 @@ dotnet run --project src/Api/AiJobMarketIntelligence.Api
 ## 📁 Project Structure
 
 ```
-src/
+api/src/
 ├── Domain/              → Entities (JobRaw, JobProcessed, Skill, JobSkill)
 ├── Infrastructure/      → DbContext, Repositories, Migrations
 ├── Application/         → Services, DTOs, Providers
-├── Api/                → Controllers, Program.cs
-└── Worker/             → Background service
+├── Api/                 → Controllers, Program.cs
+└── Worker/              → Background service
 ```
 
 ## 🔌 Key Classes
@@ -72,46 +72,32 @@ dotnet test
 ### Create New Migration
 ```bash
 dotnet ef migrations add [Name] \
-  --project src/Infrastructure \
-  --startup-project src/Api
+  --project api/src/Infrastructure \
+  --startup-project api/src/Api
 ```
 
 ### Apply Migration
 ```bash
 dotnet ef database update \
-  --project src/Infrastructure \
-  --startup-project src/Api
+  --project api/src/Infrastructure \
+  --startup-project api/src/Api
 ```
 
 ### Run Worker
 ```bash
-dotnet run --project src/Worker/AiJobMarketIntelligence.Worker
+dotnet run --project api/src/Worker/AiJobMarketIntelligence.Worker
 ```
 
 ### View Logs
 ```bash
 # API logs appear in console when running:
-dotnet run --project src/Api/AiJobMarketIntelligence.Api
+dotnet run --project api/src/Api/AiJobMarketIntelligence.Api
 ```
-
-### Docker Build
-```bash
-docker-compose build
-docker-compose up
-```
-
-## 📝 Configuration Files
-
-| File | Purpose |
-|------|---------|
-| `appsettings.json` | Main configuration |
-| `appsettings.Development.json` | Dev logging |
-| `.env` | Environment variables (local) |
 
 ## 🔑 Connection String Locations
 
-- **API**: `src/Api/AiJobMarketIntelligence.Api/appsettings.json`
-- **Worker**: `src/Worker/AiJobMarketIntelligence.Worker/appsettings.json`
+- **API**: `api/src/Api/AiJobMarketIntelligence.Api/appsettings.json`
+- **Worker**: `api/src/Worker/AiJobMarketIntelligence.Worker/appsettings.json`
 
 ## 📚 Documentation
 
@@ -158,12 +144,12 @@ TO DISK = 'C:\backup\db.bak'
 
 # Reset database (WARNING: deletes all data)
 dotnet ef database drop \
-  --project src/Infrastructure \
-  --startup-project src/Api
+  --project api/src/Infrastructure \
+  --startup-project api/src/Api
 
 # View current migrations
 dotnet ef migrations list \
-  --project src/Infrastructure
+  --project api/src/Infrastructure
 ```
 
 ## 📊 Useful API Queries
@@ -196,12 +182,12 @@ curl "https://localhost:7001/api/jobs?pageNumber=2&pageSize=50"
 
 | Item | Location |
 |------|----------|
-| API Controllers | `src/Api/AiJobMarketIntelligence.Api/Controllers/` |
-| Entities | `src/Domain/AiJobMarketIntelligence.Domain/Entities/` |
-| Repositories | `src/Infrastructure/.../Repositories/` |
-| Services | `src/Application/.../Services/` |
-| Migrations | `src/Infrastructure/.../Data/Migrations/` |
-| Configuration | `src/{Api,Worker}/.../appsettings.json` |
+| API Controllers | `api/src/Api/AiJobMarketIntelligence.Api/Controllers/` |
+| Entities | `api/src/Domain/AiJobMarketIntelligence.Domain/Entities/` |
+| Repositories | `api/src/Infrastructure/.../Repositories/` |
+| Services | `api/src/Application/.../Services/` |
+| Migrations | `api/src/Infrastructure/.../Data/Migrations/` |
+| Configuration | `api/src/{Api,Worker}/.../appsettings.json` |
 
 ## ⚡ Performance Tips
 
@@ -215,10 +201,10 @@ curl "https://localhost:7001/api/jobs?pageNumber=2&pageSize=50"
 
 1. Read `README.md` - Understand project
 2. Read `DEVELOPMENT.md` - Learn architecture
-3. Explore `src/Domain/` - Understand entities
-4. Explore `src/Infrastructure/` - Learn data access
-5. Explore `src/Application/` - Understand services
-6. Explore `src/Api/` - See API structure
+3. Explore `api/src/Domain/` - Understand entities
+4. Explore `api/src/Infrastructure/` - Learn data access
+5. Explore `api/src/Application/` - Understand services
+6. Explore `api/src/Api/` - See API structure
 7. Modify code and extend features
 
 ---

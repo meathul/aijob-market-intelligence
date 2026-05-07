@@ -6,7 +6,7 @@
 1. This file (you are here)
 2. `QUICK_REFERENCE.md` - 5-minute quick start
 3. `README.md` - Complete project overview
-4. Run the project: `dotnet run --project src/Api/...`
+4. Run the project: `dotnet run --project api/src/Api/...`
 
 ## 📚 Documentation Guide
 
@@ -89,69 +89,21 @@
 ```
 AiJobMarketIntelligence/
 │
-├── src/
-│   │
-│   ├── Domain/                          # Core entities
-│   │   └── Entities/
-│   │       ├── JobRaw.cs               # 39 lines - Raw job data
-│   │       ├── JobProcessed.cs         # 26 lines - Processed job data
-│   │       ├── Skill.cs                # 22 lines - Skill catalog
-│   │       └── JobSkill.cs             # 20 lines - Join table
-│   │
-│   ├── Infrastructure/                  # Data access layer
-│   │   ├── Data/
-│   │   │   ├── AiJobContext.cs        # 129 lines - DbContext (Fluent API)
-│   │   │   └── Migrations/
-│   │   │       ├── 20260413153135_InitialCreate.cs
-│   │   │       ├── 20260413153135_InitialCreate.Designer.cs
-│   │   │       └── AiJobContextModelSnapshot.cs
-│   │   │
-│   │   └── Repositories/
-│   │       ├── IJobRepository.cs       # 125 lines - Job repository + interface
-│   │       └── ISkillRepository.cs     # 57 lines - Skill repository + interface
-│   │
-│   ├── Application/                     # Business logic layer
-│   │   ├── DTOs/
-│   │   │   ├── JobRawDto.cs           # 27 lines - DTO for raw jobs
-│   │   │   ├── JobProcessedDto.cs     # 18 lines - DTO for processed jobs
-│   │   │   ├── JobSkillDto.cs         # 11 lines - DTO for skills
-│   │   │   └── JobSearchResultDto.cs  # 20 lines - DTO for search results
-│   │   │
-│   │   └── Services/
-│   │       ├── JobIngestionService.cs # 96 lines - Core ingestion logic
-│   │       └── Providers/
-│   │           ├── IJobProvider.cs    # 11 lines - Provider interface
-│   │           ├── MockJobProvider.cs # 64 lines - Mock implementation
-│   │           └── AdzunaJobProvider.cs # 139 lines - Example Adzuna provider
-│   │
-│   ├── Api/                             # Web API layer
-│   │   ├── Controllers/
-│   │   │   ├── JobsController.cs      # 155 lines - Job endpoints
-│   │   │   └── AdminController.cs     # 62 lines - Admin endpoints
-│   │   │
-│   │   ├── Program.cs                 # 72 lines - DI & configuration
-│   │   ├── appsettings.json           # Configuration
-│   │   └── appsettings.Development.json
-│   │
-│   └── Worker/                          # Background service layer
-│       ├── Worker.cs                  # 75 lines - Job ingestion worker
-│       ├── Program.cs                 # 35 lines - Worker host config
-│       ├── appsettings.json
-│       └── appsettings.Development.json
-│
-├── Documentation/
-│   ├── README.md                        # 300+ lines - Project overview
-│   ├── DEVELOPMENT.md                   # 400+ lines - Development guide
-│   ├── INSTALLATION.md                  # 500+ lines - Setup & deployment
-│   ├── PROJECT_SUMMARY.md               # 300+ lines - Delivery summary
-│   ├── QUICK_REFERENCE.md               # 200+ lines - Quick reference
-│   └── INDEX.md                         # This file
-│
-├── Configuration/
-│   ├── .gitignore                       # Git ignore patterns
-│   └── AiJobMarketIntelligence.slnx    # Solution file
-│
-└── (Source code files: 22 files, ~1200 lines of C#)
+├── docs/
+├── api/
+│   ├── src/
+│   │   ├── Domain/                          # Core entities
+│   │   ├── Infrastructure/                  # Data access layer
+│   │   ├── Application/                     # Business logic layer
+│   │   ├── Api/                             # Web API layer
+│   │   └── Worker/                          # Background worker
+│   └── tests/
+│       ├── UnitTests/
+│       └── IntegrationTests/
+├── ui/
+│   ├── src/
+│   └── tests/
+└── AiJobMarketIntelligence.slnx
 ```
 
 ## 📊 Project Statistics

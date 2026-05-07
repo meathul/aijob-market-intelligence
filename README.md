@@ -15,45 +15,51 @@ This platform provides:
 
 ```
 AiJobMarketIntelligence/
-├── src/
-│   ├── Domain/                          # Entity models and interfaces
-│   │   └── Entities/
-│   │       ├── JobRaw.cs               # Raw job data from external sources
-│   │       ├── JobProcessed.cs         # Processed job data (after AI analysis)
-│   │       ├── Skill.cs                # Job skill entities
-│   │       └── JobSkill.cs             # Join table for job-skill relationship
-│   │
-│   ├── Infrastructure/                  # Data access and external services
-│   │   ├── Data/
-│   │   │   ├── AiJobContext.cs         # EF Core DbContext
-│   │   │   └── Migrations/             # Database migrations
-│   │   └── Repositories/
-│   │       ├── IJobRepository.cs       # Job data access
-│   │       └── ISkillRepository.cs     # Skill data access
-│   │
-│   ├── Application/                     # Business logic and services
-│   │   ├── DTOs/                       # Data transfer objects
-│   │   │   ├── JobRawDto.cs
-│   │   │   ├── JobProcessedDto.cs
-│   │   │   ├── JobSkillDto.cs
-│   │   │   └── JobSearchResultDto.cs
-│   │   └── Services/
-│   │       ├── JobIngestionService.cs  # Core ingestion logic
-│   │       └── Providers/
-│   │           ├── IJobProvider.cs     # Abstract job provider
-│   │           └── MockJobProvider.cs  # Mock implementation
-│   │
-│   ├── Api/                             # ASP.NET Core Web API
-│   │   ├── Controllers/
-│   │   │   ├── JobsController.cs       # Job query endpoints
-│   │   │   └── AdminController.cs      # Administrative endpoints
-│   │   ├── Program.cs                  # Configuration and DI setup
-│   │   └── appsettings.json            # API configuration
-│   │
-│   └── Worker/                          # Background job processing service
-│       ├── Worker.cs                   # JobIngestionWorker implementation
-│       ├── Program.cs                  # Worker host configuration
-│       └── appsettings.json            # Worker configuration
+├── docs/
+├── api/
+│   ├── src/
+│   │   ├── Domain/                          # Entity models and interfaces
+│   │   │   └── Entities/
+│   │   │       ├── JobRaw.cs               # Raw job data from external sources
+│   │   │       ├── JobProcessed.cs         # Processed job data (after AI analysis)
+│   │   │       ├── Skill.cs                # Job skill entities
+│   │   │       └── JobSkill.cs             # Join table for job-skill relationship
+│   │   ├── Infrastructure/                  # Data access and external services
+│   │   │   ├── Data/
+│   │   │   │   ├── AiJobContext.cs         # EF Core DbContext
+│   │   │   │   └── Migrations/             # Database migrations
+│   │   │   └── Repositories/
+│   │   ├── Application/                     # Business logic and services
+│   │   │   ├── DTOs/                       # Data transfer objects
+│   │   │   │   ├── JobRawDto.cs
+│   │   │   │   ├── JobProcessedDto.cs
+│   │   │   │   ├── JobSkillDto.cs
+│   │   │   │   └── JobSearchResultDto.cs
+│   │   │   └── Services/
+│   │   │       ├── JobIngestionService.cs  # Core ingestion logic
+│   │   │       └── Providers/
+│   │   │           ├── IJobProvider.cs     # Abstract job provider
+│   │   │           └── MockJobProvider.cs  # Mock implementation
+│   │   ├── Api/                             # ASP.NET Core Web API
+│   │   │   ├── Controllers/
+│   │   │   │   ├── JobsController.cs       # Job query endpoints
+│   │   │   │   └── AdminController.cs      # Administrative endpoints
+│   │   │   ├── Program.cs                  # Configuration and DI setup
+│   │   │   └── appsettings.json            # API configuration
+│   │   └── Worker/                          # Background job processing service
+│   │       ├── Worker.cs                   # JobIngestionWorker implementation
+│   │       ├── Program.cs                  # Worker host configuration
+│   │       └── appsettings.json            # Worker configuration
+│   └── tests/
+│       ├── UnitTests/
+│       └── IntegrationTests/
+├── ui/
+│   ├── src/
+│   └── tests/
+├── build/
+├── tools/
+├── README.md
+└── AiJobMarketIntelligence.slnx
 ```
 
 ## 🗄️ Database Design
@@ -118,17 +124,17 @@ cd /Users/athulkrishnagopakumar/Desktop/Aijob
 
 3. **Apply database migrations**
 ```bash
-dotnet ef database update --project src/Infrastructure/AiJobMarketIntelligence.Infrastructure --startup-project src/Api/AiJobMarketIntelligence.Api
+dotnet ef database update --project api/src/Infrastructure/AiJobMarketIntelligence.Infrastructure --startup-project api/src/Api/AiJobMarketIntelligence.Api
 ```
 
 4. **Run the API**
 ```bash
-dotnet run --project src/Api/AiJobMarketIntelligence.Api
+dotnet run --project api/src/Api/AiJobMarketIntelligence.Api
 ```
 
 5. **Run the background worker** (in a separate terminal)
 ```bash
-dotnet run --project src/Worker/AiJobMarketIntelligence.Worker
+dotnet run --project api/src/Worker/AiJobMarketIntelligence.Worker
 ```
 
 ## 📡 API Endpoints
@@ -294,7 +300,7 @@ builder.Services.AddScoped<IJobProvider, MockJobProvider>();
 
 ### 1. Start the API
 ```bash
-dotnet run --project src/Api/AiJobMarketIntelligence.Api
+dotnet run --project api/src/Api/AiJobMarketIntelligence.Api
 ```
 
 ### 2. Access Swagger UI
@@ -379,11 +385,11 @@ Access logs in application console or debug output.
 
 ### Migrations
 All database migrations are stored in:
-`src/Infrastructure/AiJobMarketIntelligence.Infrastructure/Data/Migrations/`
+`api/src/Infrastructure/AiJobMarketIntelligence.Infrastructure/Data/Migrations/`
 
 To create a new migration:
 ```bash
-dotnet ef migrations add [MigrationName] --project src/Infrastructure/AiJobMarketIntelligence.Infrastructure --startup-project src/Api/AiJobMarketIntelligence.Api
+dotnet ef migrations add [MigrationName] --project api/src/Infrastructure/AiJobMarketIntelligence.Infrastructure --startup-project api/src/Api/AiJobMarketIntelligence.Api
 ```
 
 ## 🐛 Troubleshooting
