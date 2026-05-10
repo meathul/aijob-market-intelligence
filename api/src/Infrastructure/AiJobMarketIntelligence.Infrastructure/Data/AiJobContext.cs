@@ -103,8 +103,18 @@ public class AiJobContext : DbContext
             entity.Property(e => e.Currency)
                 .HasMaxLength(3);
 
+            entity.Property(e => e.SalaryPeriod)
+                .HasConversion<int>()
+                .HasColumnType("int")
+                .HasDefaultValue(SalaryPeriod.Unknown);
+
             entity.Property(e => e.ExperienceLevel)
                 .HasMaxLength(50);
+
+            entity.Property(e => e.ProcessedAt)
+                .IsRequired()
+                .HasColumnType("timestamp")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             // Foreign key configuration
             entity.HasOne(e => e.JobRaw)

@@ -5,6 +5,8 @@ using AiJobMarketIntelligence.Application.Services;
 using AiJobMarketIntelligence.Application.Services.Providers;
 using AiJobMarketIntelligence.Application.Interfaces.Repositories;
 using AiJobMarketIntelligence.Application.Interfaces.Services;
+using AiJobMarketIntelligence.Application.Services.Salary;
+using AiJobMarketIntelligence.Application.Services.Processing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,11 @@ builder.Services.AddDbContext<AiJobContext>(options =>
 // Register repositories (Infrastructure implementations for Application interfaces)
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<ISkillRepository, SkillRepository>();
+builder.Services.AddScoped<IJobProcessedRepository, JobProcessedRepository>();
+
+// Salary parsing + processing pipeline (processing runs in Worker; API reuses services for any ad-hoc processing needs)
+builder.Services.AddSingleton<ISalaryParserService, SalaryParserService>();
+builder.Services.AddScoped<IJobProcessingService, JobProcessingService>();
 
 // Register job query service
 builder.Services.AddScoped<IJobQueryService, JobQueryService>();

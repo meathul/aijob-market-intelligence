@@ -15,5 +15,9 @@ public class JobProcessedDto
     
     public string? Currency { get; set; }
     
+    public string? SalaryPeriod { get; set; }
+    
     public string? ExperienceLevel { get; set; }
+    
+    public DateTime ProcessedAt { get; set; }
 }

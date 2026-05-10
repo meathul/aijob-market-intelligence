@@ -5,6 +5,8 @@ using AiJobMarketIntelligence.Infrastructure.Repositories;
 using AiJobMarketIntelligence.Application.Services;
 using AiJobMarketIntelligence.Application.Services.Providers;
 using AiJobMarketIntelligence.Application.Interfaces.Repositories;
+using AiJobMarketIntelligence.Application.Services.Salary;
+using AiJobMarketIntelligence.Application.Services.Processing;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -21,14 +23,24 @@ builder.Services.AddDbContext<AiJobContext>(options =>
 // Register repositories (Infrastructure implementations for Application interfaces)
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<ISkillRepository, SkillRepository>();
+builder.Services.AddScoped<IJobProcessedRepository, JobProcessedRepository>();
+
+// Salary parsing + processing pipeline
+builder.Services.AddSingleton<ISalaryParserService, SalaryParserService>();
+builder.Services.AddScoped<IJobProcessingService, JobProcessingService>();
 
 // Register Adzuna provider (real job data from free Adzuna API)
 builder.Services.AddScoped<AdzunaJobProvider>();
 builder.Services.AddScoped<IJobProvider>(sp => sp.GetRequiredService<AdzunaJobProvider>());
+
+// Register job ingestion service
 builder.Services.AddScoped<IJobIngestionService, JobIngestionService>();
 
 // Add the background job ingestion worker
 builder.Services.AddHostedService<JobIngestionWorker>();
+
+// Add the background job processing worker
+builder.Services.AddHostedService<JobProcessingWorker>();
 
 // Configure logging
 builder.Services.AddLogging(config =>

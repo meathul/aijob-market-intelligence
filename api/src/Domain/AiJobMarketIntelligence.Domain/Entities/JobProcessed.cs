@@ -16,8 +16,12 @@ public class JobProcessed
     
     public string? Currency { get; set; }
     
+    public SalaryPeriod SalaryPeriod { get; set; } = SalaryPeriod.Unknown;
+    
     public string? ExperienceLevel { get; set; }
     
+    public DateTime ProcessedAt { get; set; } = DateTime.UtcNow;
+
     // Navigation property
     public JobRaw JobRaw { get; set; } = null!;
 }
