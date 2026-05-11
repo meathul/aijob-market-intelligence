@@ -21,8 +21,4 @@
     <ProjectReference Include="../../api/src/Domain/AiJobMarketIntelligence.Domain/AiJobMarketIntelligence.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="*.cs" />
-  </ItemGroup>
-
 </Project>
