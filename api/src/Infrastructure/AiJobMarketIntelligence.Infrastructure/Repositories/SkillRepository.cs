@@ -1,13 +1,13 @@
-using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AiJobMarketIntelligence.Application.Interfaces.Repositories;
 using AiJobMarketIntelligence.Domain.Entities;
 using AiJobMarketIntelligence.Infrastructure.Data;
-using AiJobMarketIntelligence.Application.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace AiJobMarketIntelligence.Infrastructure.Repositories;
 
-/// <summary>
-/// Repository for Skill entities.
-/// </summary>
 public class SkillRepository : ISkillRepository
 {
     private readonly AiJobContext _context;
@@ -19,14 +19,12 @@ public class SkillRepository : ISkillRepository
 
     public async Task<Skill?> GetByIdAsync(int id)
     {
-        return await _context.Skills
-            .FirstOrDefaultAsync(s => s.Id == id);
+        return await _context.Skills.FindAsync(id);
     }
 
     public async Task<Skill?> GetByNameAsync(string name)
     {
-        return await _context.Skills
-            .FirstOrDefaultAsync(s => s.Name == name);
+        return await _context.Skills.FirstOrDefaultAsync(s => s.SkillName.ToLower() == name.ToLower());
     }
 
     public async Task<List<Skill>> GetAllAsync()
@@ -44,46 +42,31 @@ public class SkillRepository : ISkillRepository
         await _context.Skills.AddRangeAsync(skills);
     }
 
-    public async Task SaveAsync()
-    {
-        await _context.SaveChangesAsync();
-    }
-
     public async Task<bool> ExistsByNameAsync(string name)
     {
-        return await _context.Skills.AnyAsync(s => s.Name == name);
+        return await _context.Skills.AnyAsync(s => s.SkillName.ToLower() == name.ToLower());
     }
 
     public async Task<List<string>> GetSkillsByJobRawIdAsync(int jobRawId)
     {
         return await _context.JobSkills
             .Where(js => js.JobRawId == jobRawId)
-            .Select(js => js.Skill.Name)
+            .Select(js => js.SkillName)
             .ToListAsync();
     }
 
     public async Task AddJobSkillAsync(int jobRawId, string skillName)
     {
-        // Check if skill exists
-        var skill = await GetByNameAsync(skillName);
-        if (skill == null)
-        {
-            // Create new skill if it doesn't exist
-            skill = new Skill { Name = skillName };
-            await AddAsync(skill);
-            await SaveAsync();
-        }
+        // Check if the skill already exists for this job
+        var exists = await _context.JobSkills
+            .AnyAsync(js => js.JobRawId == jobRawId && js.SkillName.ToLower() == skillName.ToLower());
 
-        // Check if job-skill association already exists
-        var existingJobSkill = await _context.JobSkills
-            .FirstOrDefaultAsync(js => js.JobRawId == jobRawId && js.SkillId == skill.Id);
-
-        if (existingJobSkill == null)
+        if (!exists)
         {
             var jobSkill = new JobSkill
             {
                 JobRawId = jobRawId,
-                SkillId = skill.Id
+                SkillName = skillName
             };
             await _context.JobSkills.AddAsync(jobSkill);
         }
@@ -92,8 +75,12 @@ public class SkillRepository : ISkillRepository
     public async Task<List<JobSkill>> GetJobSkillsByJobRawIdAsync(int jobRawId)
     {
         return await _context.JobSkills
-            .Include(js => js.Skill)
             .Where(js => js.JobRawId == jobRawId)
             .ToListAsync();
+    }
+
+    public async Task SaveAsync()
+    {
+        await _context.SaveChangesAsync();
     }
 }

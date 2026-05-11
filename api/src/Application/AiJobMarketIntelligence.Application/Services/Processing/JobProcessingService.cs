@@ -1,5 +1,6 @@
 using AiJobMarketIntelligence.Application.Interfaces.Repositories;
 using AiJobMarketIntelligence.Application.Services.Salary;
+using AiJobMarketIntelligence.Application.Services.Skills;
 using AiJobMarketIntelligence.Domain.Entities;
 using Microsoft.Extensions.Logging;
 
@@ -9,18 +10,24 @@ public sealed class JobProcessingService : IJobProcessingService
 {
     private readonly IJobRepository _jobRepository;
     private readonly IJobProcessedRepository _jobProcessedRepository;
+    private readonly ISkillRepository _skillRepository;
     private readonly ISalaryParserService _salaryParser;
+    private readonly ISkillExtractionService _skillExtractor;
     private readonly ILogger<JobProcessingService> _logger;
 
     public JobProcessingService(
         IJobRepository jobRepository,
         IJobProcessedRepository jobProcessedRepository,
+        ISkillRepository skillRepository,
         ISalaryParserService salaryParser,
+        ISkillExtractionService skillExtractor,
         ILogger<JobProcessingService> logger)
     {
         _jobRepository = jobRepository;
         _jobProcessedRepository = jobProcessedRepository;
+        _skillRepository = skillRepository;
         _salaryParser = salaryParser;
+        _skillExtractor = skillExtractor;
         _logger = logger;
     }
 
@@ -60,6 +67,19 @@ public sealed class JobProcessingService : IJobProcessingService
 
                 await _jobProcessedRepository.UpsertByRawJobIdAsync(processed);
 
+                // Extract skills from job description and title
+                var skills = await _skillExtractor.ExtractSkillsAsync(raw.Description, raw.Title);
+                
+                if (skills.Count > 0)
+                {
+                    // Associate skills with the job
+                    foreach (var skillName in skills)
+                    {
+                        await _skillRepository.AddJobSkillAsync(raw.Id, skillName);
+                        _logger.LogDebug($"Skill '{skillName}' extracted for job {raw.Id}");
+                    }
+                }
+
                 raw.IsProcessed = true;
                 await _jobRepository.UpdateAsync(raw);
 
@@ -74,6 +94,7 @@ public sealed class JobProcessingService : IJobProcessingService
 
         await _jobProcessedRepository.SaveAsync();
         await _jobRepository.SaveAsync();
+        await _skillRepository.SaveAsync();
 
         _logger.LogInformation("Processed {Count} jobs", processedCount);
         return processedCount;

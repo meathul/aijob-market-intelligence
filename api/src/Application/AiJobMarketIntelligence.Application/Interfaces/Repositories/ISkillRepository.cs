@@ -13,5 +13,10 @@ public interface ISkillRepository
 
     Task<bool> ExistsByNameAsync(string name);
 
+    // Job skill associations
+    Task<List<string>> GetSkillsByJobRawIdAsync(int jobRawId);
+    Task AddJobSkillAsync(int jobRawId, string skillName);
+    Task<List<JobSkill>> GetJobSkillsByJobRawIdAsync(int jobRawId);
+
     Task SaveAsync();
 }
