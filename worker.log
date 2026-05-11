@@ -3205,3 +3205,181 @@ info: AiJobMarketIntelligence.Application.Services.Processing.JobProcessingServi
       No unprocessed jobs found
 info: AiJobMarketIntelligence.Worker.JobProcessingWorker[0]
       Job processing run completed. Jobs processed: 0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (14ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT `j`.`Id`, `j`.`Company`, `j`.`CreatedAt`, `j`.`Description`, `j`.`IsProcessed`, `j`.`Location`, `j`.`PostedDate`, `j`.`SalaryRaw`, `j`.`Source`, `j`.`Title`, `j`.`Url`
+      FROM `JobsRaw` AS `j`
+      WHERE NOT (`j`.`IsProcessed`)
+      ORDER BY `j`.`CreatedAt`
+info: AiJobMarketIntelligence.Application.Services.Processing.JobProcessingService[0]
+      No unprocessed jobs found
+info: AiJobMarketIntelligence.Worker.JobProcessingWorker[0]
+      Job processing run completed. Jobs processed: 0
+info: AiJobMarketIntelligence.Worker.JobIngestionWorker[0]
+      Starting job ingestion at 05/11/2026 02:24:32
+info: AiJobMarketIntelligence.Application.Services.JobIngestionService[0]
+      Starting job ingestion process
+info: AiJobMarketIntelligence.Application.Services.Providers.AdzunaJobProvider[0]
+      Starting job fetch from real APIs
+info: AiJobMarketIntelligence.Application.Services.Providers.AdzunaJobProvider[0]
+      Fetching jobs from Remotive API
+warn: AiJobMarketIntelligence.Application.Services.Providers.AdzunaJobProvider[0]
+      Remotive API returned status 526
+info: AiJobMarketIntelligence.Application.Services.Providers.AdzunaJobProvider[0]
+      Fetched 0 jobs from Remotive
+info: AiJobMarketIntelligence.Application.Services.Providers.AdzunaJobProvider[0]
+      Fetching jobs from GitHub Jobs API
+warn: AiJobMarketIntelligence.Application.Services.Providers.AdzunaJobProvider[0]
+      GitHub Jobs API returned status NotFound
+info: AiJobMarketIntelligence.Application.Services.Providers.AdzunaJobProvider[0]
+      Fetched 0 jobs from GitHub Jobs
+info: AiJobMarketIntelligence.Application.Services.Providers.AdzunaJobProvider[0]
+      External APIs unavailable or insufficient data. Loading demo/test jobs for development/testing.
+info: AiJobMarketIntelligence.Application.Services.Providers.AdzunaJobProvider[0]
+      Loaded 23 demo/test jobs for development
+info: AiJobMarketIntelligence.Application.Services.Providers.AdzunaJobProvider[0]
+      Successfully fetched 23 total jobs (mix of real APIs and test data if needed)
+info: AiJobMarketIntelligence.Application.Services.JobIngestionService[0]
+      Fetched 23 jobs from provider
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (3ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (0ms) [Parameters=[@__url_0='?' (Size = 2000)], CommandType='Text', CommandTimeout='30']
+      SELECT EXISTS (
+          SELECT 1
+          FROM `JobsRaw` AS `j`
+          WHERE `j`.`Url` = @__url_0)
+info: AiJobMarketIntelligence.Application.Services.JobIngestionService[0]
+      No new jobs to add after deduplication
+info: AiJobMarketIntelligence.Worker.JobIngestionWorker[0]
+      Next job ingestion scheduled in 30 minutes

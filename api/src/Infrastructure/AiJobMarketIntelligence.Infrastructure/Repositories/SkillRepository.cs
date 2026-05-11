@@ -24,7 +24,7 @@ public class SkillRepository : ISkillRepository
 
     public async Task<Skill?> GetByNameAsync(string name)
     {
-        return await _context.Skills.FirstOrDefaultAsync(s => s.SkillName.ToLower() == name.ToLower());
+        return await _context.Skills.FirstOrDefaultAsync(s => s.Name.ToLower() == name.ToLower());
     }
 
     public async Task<List<Skill>> GetAllAsync()
@@ -44,29 +44,39 @@ public class SkillRepository : ISkillRepository
 
     public async Task<bool> ExistsByNameAsync(string name)
     {
-        return await _context.Skills.AnyAsync(s => s.SkillName.ToLower() == name.ToLower());
+        return await _context.Skills.AnyAsync(s => s.Name.ToLower() == name.ToLower());
     }
 
     public async Task<List<string>> GetSkillsByJobRawIdAsync(int jobRawId)
     {
         return await _context.JobSkills
             .Where(js => js.JobRawId == jobRawId)
-            .Select(js => js.SkillName)
+            .Select(js => js.Skill.Name)
             .ToListAsync();
     }
 
     public async Task AddJobSkillAsync(int jobRawId, string skillName)
     {
-        // Check if the skill already exists for this job
+        // Check if skill exists
+        var skill = await GetByNameAsync(skillName);
+        if (skill == null)
+        {
+            // Create new skill if it doesn't exist
+            skill = new Skill { Name = skillName };
+            await AddAsync(skill);
+            await SaveAsync();
+        }
+
+        // Check if the job-skill association already exists
         var exists = await _context.JobSkills
-            .AnyAsync(js => js.JobRawId == jobRawId && js.SkillName.ToLower() == skillName.ToLower());
+            .AnyAsync(js => js.JobRawId == jobRawId && js.SkillId == skill.Id);
 
         if (!exists)
         {
             var jobSkill = new JobSkill
             {
                 JobRawId = jobRawId,
-                SkillName = skillName
+                SkillId = skill.Id
             };
             await _context.JobSkills.AddAsync(jobSkill);
         }
