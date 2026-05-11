@@ -1,223 +1,453 @@
-# Testing Guide - AI Job Market Intelligence Platform
+# Testing & Populating JobSkills Table
 
-## Quick Start
+## Overview
 
-### Start the API
+This guide walks you through testing the OpenAI ChatGPT skill extraction and populating the `JobSkills` table with extracted skills.
+
+## Prerequisites
+
+1. ✅ OpenAI API key (from https://platform.openai.com/account/api-keys)
+2. ✅ MySQL database running (AiJobMarketIntelligence)
+3. ✅ .env file configured with your API key
+4. ✅ .NET 8.0.420 SDK installed
+
+## Quick Test (5 minutes)
+
+### Step 1: Configure Your API Key
+
+Edit `.env` file in project root:
+```bash
+nano .env
+```
+
+Add your OpenAI API key:
+```
+OPENAI_API_KEY=sk-your-actual-api-key-here
+```
+
+### Step 2: Start the Worker
+
+The Worker automatically:
+1. Ingests jobs (every 30 minutes)
+2. Processes jobs (every 15 minutes)
+3. Extracts skills using ChatGPT
+4. Saves to JobSkills table
+
 ```bash
 cd /Users/athulkrishnagopakumar/project/Aijob
-dotnet run --project api/src/Api/AiJobMarketIntelligence.Api
+dotnet run --project api/src/Worker/AiJobMarketIntelligence.Worker/
 ```
 
-The API will be available at `http://localhost:5062`
+### Step 3: Monitor the Logs
 
-### Trigger Job Fetch
-```bash
-curl -X POST http://localhost:5062/api/admin/trigger-fetch
-```
-
-### Get All Jobs
-```bash
-curl http://localhost:5062/api/jobs
-```
-
-### Get Paginated Jobs
-```bash
-curl "http://localhost:5062/api/jobs?pageNumber=1&pageSize=10"
-```
-
-### Search Jobs
-```bash
-curl "http://localhost:5062/api/jobs/search?query=Developer"
-```
-
-### Get Single Job
-```bash
-curl http://localhost:5062/api/jobs/1
-```
-
----
-
-## How the System Works
-
-### Data Sources
-
-The system uses a multi-source approach:
-
-1. **Remotive API** (Primary)
-   - URL: `https://remotive.io/api/remote-jobs`
-   - Returns: Up to 50 remote developer jobs
-   - Auth: None required
-   - Status: May fail due to network restrictions in some environments
-
-2. **GitHub Jobs API** (Fallback)
-   - URL: `https://api.github.com/jobs?description=developer`
-   - Returns: Up to 30 developer jobs (API is deprecated but still works)
-   - Auth: None required
-   - Status: May return limited results
-
-3. **Demo/Test Data** (Development Fallback)
-   - 23 sample tech job listings
-   - Used when external APIs are unavailable
-   - Clearly marked with `"source": "Sample"` in responses
-   - Useful for testing in environments with network restrictions
-
-### Data Flow
+Look for these success messages:
 
 ```
-API/Worker
-    ↓
-JobIngestionService (Orchestration)
-    ↓
-AdzunaJobProvider (Multi-source fetching)
-    ├─→ Try Remotive API
-    ├─→ If < 10 jobs, try GitHub Jobs API
-    └─→ If < 10 jobs, load demo/test data
-    ↓
-URL Deduplication
-    ↓
-JobRepository (SQLite Database)
-    ↓
-Response to Client
+[INF] Calling OpenAI ChatGPT for skill extraction
+[INF] Extracted 10 skills: C#, React, Azure, Docker, SQL Server, ...
+[INF] Skill 'C#' extracted for job 1
+[INF] Skill 'React' extracted for job 1
+...
 ```
 
-### API Endpoints
+### Step 4: Verify Database Population
 
-#### 1. Get All Jobs
-- **URL**: `GET /api/jobs`
-- **Query Params**: 
-  - `pageNumber` (default: 1)
-  - `pageSize` (default: 20, max: 100)
-- **Response**: Paginated job list
-
-#### 2. Get Single Job
-- **URL**: `GET /api/jobs/{id}`
-- **Response**: Single job with details
-
-#### 3. Search Jobs
-- **URL**: `GET /api/jobs/search`
-- **Query Params**: `query` (searches title, company, description)
-- **Response**: Matching jobs
-
-#### 4. Trigger Manual Fetch
-- **URL**: `POST /api/admin/trigger-fetch`
-- **Response**: Ingestion result with job count
-
----
-
-## Data Storage
-
-**Database**: SQLite (File-based)
-- **Location**: `api/src/Api/AiJobMarketIntelligence.Api/AiJobMarketIntelligence.db`
-- **No setup required** - database is automatically created on first run
-- **Schema**: 4 tables (JobRaw, JobProcessed, Skill, JobSkill)
-
----
-
-## Background Worker
-
-The system includes an independent background worker that automatically fetches jobs every 30 minutes:
+In a separate terminal, check the JobSkills table:
 
 ```bash
-dotnet run --project api/src/Worker/AiJobMarketIntelligence.Worker
+# Connect to MySQL
+mysql -u root -p AiJobMarketIntelligence
+
+# Query the JobSkills table
+SELECT js.Id, jr.Title, s.Name 
+FROM JobSkills js
+JOIN JobsRaw jr ON js.JobRawId = jr.Id
+JOIN Skills s ON js.SkillId = s.Id
+LIMIT 20;
 ```
 
-**Features**:
-- Runs independently from the API
-- Scheduled to fetch every 30 minutes
-- Same multi-source logic as manual fetch
-- Full logging and error handling
-
----
-
-## Environment Support
-
-### Real API Data (Requires Internet Access)
-- ✅ Remotive jobs will populate if accessible
-- ✅ GitHub Jobs will populate if Remotive fails
-- ✅ Real, authenticated data with no hardcoding
-
-### Network-Restricted Environments
-- ✅ Demo/test data automatically loads as fallback
-- ✅ System remains fully functional for testing
-- ✅ All 23 sample jobs clearly marked with `"source": "Sample"`
-- ✅ No hidden hardcoding - transparent fallback with logging
-
----
-
-## Sample Response
-
-```json
-{
-  "jobs": [
-    {
-      "id": 1,
-      "title": "Senior Software Engineer - .NET/C#",
-      "company": "TechCorp Solutions",
-      "location": "San Francisco, CA",
-      "description": "We're looking for an experienced .NET engineer...",
-      "salaryRaw": "$150,000 - $200,000 per year",
-      "source": "Sample",
-      "url": "https://techcorp.example.com/jobs/senior-dotnet-engineer",
-      "postedDate": "2026-04-15T04:44:34.763926",
-      "createdAt": "2026-04-17T04:44:34",
-      "isProcessed": false,
-      "skills": []
-    }
-  ],
-  "totalCount": 23,
-  "pageNumber": 1,
-  "pageSize": 20,
-  "totalPages": 2
-}
+Expected output:
+```
++----+------------------------------------------+------------+
+| Id | Title                                    | Name       |
++----+------------------------------------------+------------+
+|  1 | Senior Full Stack Engineer               | C#         |
+|  2 | Senior Full Stack Engineer               | React      |
+|  3 | Senior Full Stack Engineer               | Azure      |
+|  4 | Senior Full Stack Engineer               | Docker     |
+|  5 | Senior Full Stack Engineer               | SQL Server |
+|  6 | Backend Engineer                         | Python     |
+|  7 | Backend Engineer                         | Django     |
+|  8 | Backend Engineer                         | PostgreSQL |
+... and more
++----+------------------------------------------+------------+
 ```
 
----
+## Detailed Testing Steps
 
-## Future Enhancements
+### Test 1: Check Job Ingestion
 
-- [ ] AI Processing Layer: Salary extraction, experience level detection
-- [ ] Skill Tagging: Automatic skill extraction from job descriptions
-- [ ] Multiple API Sources: Indeed, LinkedIn, Stack Overflow, etc.
-- [ ] Frontend Dashboard: React/Vue UI for job browsing
-- [ ] Advanced Filtering: By salary, skills, location, experience level
-- [ ] Job Notifications: Email alerts for matching jobs
+Before skill extraction can happen, jobs must be ingested.
 
----
+```bash
+# Check JobsRaw table
+mysql -u root -p AiJobMarketIntelligence
+SELECT COUNT(*) as TotalJobs FROM JobsRaw;
+```
+
+Expected: Should show number of ingested jobs (demo has 23+)
+
+```sql
+SELECT Id, Title, Source FROM JobsRaw LIMIT 5;
+```
+
+Expected output:
+```
++----+------------------------------------------+--------+
+| Id | Title                                    | Source |
++----+------------------------------------------+--------+
+|  1 | Senior Full Stack Engineer               | Demo   |
+|  2 | Backend Engineer                         | Demo   |
+|  3 | Frontend Developer                       | Demo   |
+... more jobs
+```
+
+### Test 2: Check Job Processing
+
+Jobs must be processed before skills are extracted.
+
+```bash
+# Check JobsProcessed table
+SELECT COUNT(*) as ProcessedJobs FROM JobsProcessed;
+```
+
+Expected: Should match or be less than JobsRaw count
+
+```sql
+SELECT Id, JobRawId, SalaryMin, SalaryMax, ExperienceLevel, ProcessedAt 
+FROM JobsProcessed 
+LIMIT 5;
+```
+
+Expected output:
+```
++----+---------+----------+----------+----------------+---------------------+
+| Id | JobRawId| SalaryMin| SalaryMax| ExperienceLevel| ProcessedAt         |
++----+---------+----------+----------+----------------+---------------------+
+|  1 |       1 |    120000|    180000| Senior         | 2026-05-11 12:00:00 |
+|  2 |       2 |     90000|    150000| Mid            | 2026-05-11 12:00:00 |
+|  3 |       3 |     80000|    120000| Mid            | 2026-05-11 12:00:00 |
+... more processed jobs
+```
+
+### Test 3: Check Skills Extraction
+
+After processing, skills should be extracted.
+
+```bash
+# Count extracted skills
+SELECT COUNT(*) as TotalExtractedSkills FROM JobSkills;
+```
+
+Expected: > 0 (should have extracted skills)
+
+```sql
+# See skills by job
+SELECT 
+    jr.Id as JobId,
+    jr.Title,
+    COUNT(js.Id) as SkillCount,
+    GROUP_CONCAT(s.Name SEPARATOR ', ') as Skills
+FROM JobSkills js
+JOIN JobsRaw jr ON js.JobRawId = jr.Id
+JOIN Skills s ON js.SkillId = s.Id
+GROUP BY jr.Id, jr.Title
+LIMIT 10;
+```
+
+Expected output:
+```
++-------+------------------------------------------+----------+-------------------------------------------+
+| JobId | Title                                    | Count    | Skills                                    |
++-------+------------------------------------------+----------+-------------------------------------------+
+|     1 | Senior Full Stack Engineer               |        9 | C#, React, Azure, Docker, SQL Server,... |
+|     2 | Backend Engineer                         |        6 | Python, Django, PostgreSQL, REST API,... |
+|     3 | Frontend Developer                       |        7 | React, TypeScript, CSS, HTML, Jest,...   |
+... more jobs with skills
+```
+
+## End-to-End Test Workflow
+
+### Complete Flow (Start to Finish)
+
+```bash
+# Terminal 1: Start the Worker
+cd /Users/athulkrishnagopakumar/project/Aijob
+export OPENAI_API_KEY="sk-your-api-key"
+dotnet run --project api/src/Worker/AiJobMarketIntelligence.Worker/
+
+# Watch logs for:
+# [INF] Ingesting jobs...
+# [INF] Processing jobs...
+# [INF] Extracted X skills: ...
+```
+
+```bash
+# Terminal 2: Monitor Database (run simultaneously)
+mysql -u root -p AiJobMarketIntelligence
+
+# Keep checking these queries:
+SELECT COUNT(*) FROM JobsRaw;
+SELECT COUNT(*) FROM JobsProcessed;
+SELECT COUNT(*) FROM JobSkills;
+
+# Watch the counts increase!
+```
+
+## Timing Guide
+
+The Worker runs on schedules:
+- **Job Ingestion**: Every 30 minutes
+- **Job Processing** (salary parsing + skill extraction): Every 15 minutes
+
+To see results faster:
+
+### Option 1: Wait for Natural Schedule
+- Ingestion: Wait up to 30 minutes
+- Processing: Wait up to 15 minutes after ingestion
+- Total: 45 minutes worst case
+
+### Option 2: Manual Trigger (Advanced)
+If you want to test immediately without waiting, you can modify the Worker's scheduled times in `Program.cs`:
+
+```csharp
+// Current: Every 30 min for ingestion, every 15 min for processing
+builder.Services.AddHostedService<JobIngestionWorker>();  // 30 min interval
+builder.Services.AddHostedService<JobProcessingWorker>();  // 15 min interval
+
+// For testing: Change to every 10 seconds
+// See: api/src/Worker/AiJobMarketIntelligence.Worker/JobIngestionWorker.cs
+// and: api/src/Worker/AiJobMarketIntelligence.Worker/JobProcessingWorker.cs
+```
+
+## Expected Results
+
+### After 1st Run
+
+```
+JobsRaw:        23 jobs (ingested)
+JobsProcessed:  23 jobs (processed, salaries parsed)
+JobSkills:      150-200 skills (extracted)
+Skills:         100-150 unique skills (created)
+```
+
+### Sample Skills Extracted
+
+The system should extract a variety of skills:
+
+**Programming Languages:**
+- C#, Python, JavaScript, TypeScript, Java, Go, Rust
+
+**Frontend:**
+- React, Angular, Vue, Next.js, HTML, CSS, Tailwind
+
+**Backend:**
+- .NET, Django, Spring, Node.js, FastAPI, Laravel
+
+**Databases:**
+- MySQL, PostgreSQL, MongoDB, SQL Server, Redis, DynamoDB
+
+**Cloud/DevOps:**
+- AWS, Azure, Google Cloud, Docker, Kubernetes, CI/CD
+
+**Testing/Tools:**
+- xUnit, Jest, Pytest, Git, GitHub, Agile, Scrum
 
 ## Troubleshooting
 
-### No jobs appear after fetch
-1. Check if external APIs are accessible: `curl https://remotive.io/api/remote-jobs`
-2. If blocked, system will use demo data (this is expected)
-3. Verify database file exists: `ls api/src/Api/AiJobMarketIntelligence.Api/AiJobMarketIntelligence.db`
+### No Skills Being Extracted
 
-### Port already in use
+**Symptom:** JobSkills table remains empty
+
+**Checklist:**
+1. ✅ Verify API key in .env file
+   ```bash
+   cat .env | grep OPENAI_API_KEY
+   ```
+
+2. ✅ Check Worker logs for errors
+   ```
+   [ERR] Error extracting skills: Unauthorized
+   ```
+
+3. ✅ Verify API key is valid
+   - Visit: https://platform.openai.com/account/api-keys
+   - Check if key is still active
+
+4. ✅ Check if jobs are being processed
+   ```bash
+   mysql -u root -p AiJobMarketIntelligence
+   SELECT COUNT(*) FROM JobsProcessed;
+   ```
+
+5. ✅ Check application logs for ChatGPT errors
+   ```
+   [ERR] Error extracting skills from job description
+   ```
+
+**Solutions:**
+- Get a fresh API key from OpenAI
+- Check API rate limits (might need to wait)
+- Verify internet connection to OpenAI API
+- Check firewall/proxy settings
+
+### Database Errors
+
+**Symptom:** "Cannot connect to database"
+
 ```bash
-# Find and kill process on port 5062
-lsof -i :5062
-kill -9 <PID>
+# Test MySQL connection
+mysql -u root -p -h 127.0.0.1 AiJobMarketIntelligence
+
+# Check connection string in appsettings.json
+cat api/src/Worker/AiJobMarketIntelligence.Worker/appsettings.json
 ```
 
-### Build errors
-```bash
-# Clean and rebuild
-dotnet clean
-dotnet build
+### Duplicate Skills
+
+The system prevents duplicate job-skill associations:
+
+```sql
+-- This is normal - prevents adding same skill twice
+SELECT JobRawId, SkillId, COUNT(*) 
+FROM JobSkills 
+GROUP BY JobRawId, SkillId 
+HAVING COUNT(*) > 1;
+
+-- Should return empty (no duplicates)
 ```
+
+## Sample Test Queries
+
+### Query 1: Skills Count by Job
+
+```sql
+SELECT 
+    jr.Title,
+    COUNT(DISTINCT js.SkillId) as UniqueSkills
+FROM JobSkills js
+JOIN JobsRaw jr ON js.JobRawId = jr.Id
+GROUP BY jr.Title
+ORDER BY UniqueSkills DESC
+LIMIT 10;
+```
+
+### Query 2: Most Common Skills
+
+```sql
+SELECT 
+    s.Name,
+    COUNT(js.Id) as JobCount
+FROM JobSkills js
+JOIN Skills s ON js.SkillId = s.Id
+GROUP BY s.Name
+ORDER BY JobCount DESC
+LIMIT 20;
+```
+
+Output might show:
+```
++------------------+----------+
+| Name             | JobCount |
++------------------+----------+
+| REST API         |       18 |
+| SQL              |       17 |
+| Cloud            |       16 |
+| Git              |       15 |
+| Agile            |       14 |
+| Docker           |       13 |
+| AWS              |       12 |
+| JSON             |       12 |
+| Kubernetes       |       11 |
+| Azure            |       10 |
+```
+
+### Query 3: Skills by Category
+
+```sql
+-- You could categorize skills like this:
+SELECT 
+    CASE 
+        WHEN s.Name IN ('C#', 'Python', 'Java', 'JavaScript', 'TypeScript') 
+            THEN 'Programming Language'
+        WHEN s.Name IN ('React', 'Angular', 'Vue', 'Next.js') 
+            THEN 'Frontend Framework'
+        WHEN s.Name IN ('Django', 'Spring', '.NET', 'Node.js') 
+            THEN 'Backend Framework'
+        ELSE 'Other'
+    END as Category,
+    s.Name,
+    COUNT(js.Id) as JobCount
+FROM JobSkills js
+JOIN Skills s ON js.SkillId = s.Id
+GROUP BY Category, s.Name
+ORDER BY Category, JobCount DESC;
+```
+
+## Test Results Summary
+
+When testing is complete, you should have:
+
+✅ **23+ jobs ingested** (JobsRaw)
+✅ **23+ jobs processed** (JobsProcessed with salary/experience)
+✅ **150-200+ job-skill associations** (JobSkills)
+✅ **100-150+ unique skills** (Skills)
+✅ **No null values** (all required fields populated)
+✅ **No duplicate associations** (unique constraint working)
+
+## Performance Notes
+
+- **Skill extraction per job**: ~1-3 seconds (ChatGPT API latency)
+- **Database write time**: ~100ms per skill
+- **Total time for 23 jobs**: ~3-5 minutes
+- **Network**: Requires internet connection to OpenAI API
+
+## Next Steps
+
+After populating JobSkills table:
+
+1. **Run the API** to query skills
+   ```bash
+   dotnet run --project api/src/Api/AiJobMarketIntelligence.Api/
+   ```
+
+2. **Access Swagger UI** at http://localhost:5062/swagger
+   - Test skill search endpoints
+   - Query jobs by skill
+   - Get job details with skills
+
+3. **Build analytics** on extracted skills
+   - Most in-demand skills
+   - Skills by job level
+   - Technology trends
+
+4. **Monitor performance** and costs
+   - Track API calls
+   - Monitor ChatGPT costs
+   - Optimize extraction
+
+## Cost Estimation
+
+For populating 23 jobs:
+- 23 jobs × ~200 tokens per job = ~4,600 tokens input
+- Response tokens: ~2,000 tokens
+- Cost: ~$0.0025 USD (very cheap!)
+
+Larger datasets:
+- 1,000 jobs: ~$0.10
+- 10,000 jobs: ~$1.00
+- 100,000 jobs: ~$10.00
 
 ---
 
-## Architecture Notes
-
-**Clean Architecture Layers**:
-1. **Domain** - Job entities and skill catalog
-2. **Infrastructure** - Database access and repositories
-3. **Application** - Job fetching and ingestion logic
-4. **API** - REST endpoints and controllers
-5. **Worker** - Background scheduling service
-
-**Key Design Patterns**:
-- Repository Pattern: Abstracted data access
-- Dependency Injection: Built-in .NET container
-- Async/Await: 100% non-blocking code
-- Multi-source fallback: Resilient to API failures
+**Ready to test?** Start with Step 1 and follow the Quick Test guide above! 🚀
