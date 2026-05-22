@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using AiJobMarketIntelligence.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AiJobMarketIntelligence.Api.Controllers;
 
@@ -9,6 +10,7 @@ namespace AiJobMarketIntelligence.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Policy = "AdminOnly")]
 public class AdminController : ControllerBase
 {
     private readonly IJobIngestionService _jobIngestionService;

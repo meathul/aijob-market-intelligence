@@ -10,10 +10,12 @@ using AiJobMarketIntelligence.Application.Services.Salary;
 using AiJobMarketIntelligence.Application.Services.Skills;
 using AiJobMarketIntelligence.Application.Services.Processing;
 
-// Load environment variables from .env file
-Env.Load();
-
 var builder = Host.CreateApplicationBuilder(args);
+
+// Load environment variables from .env file (repo root)
+var envPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "..", "..", "..", "..", ".env"));
+Env.Load(envPath);
+builder.Configuration.AddEnvironmentVariables();
 
 // Configure Entity Framework Core with MySQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
