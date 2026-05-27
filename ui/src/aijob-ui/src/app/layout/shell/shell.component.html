@@ -1,0 +1,17 @@
+<div class="min-h-dvh bg-slate-950 text-slate-100">
+  <div class="mx-auto flex min-h-dvh max-w-screen-2xl">
+    <aside class="hidden w-72 shrink-0 border-r border-slate-800 bg-slate-950 md:block">
+      <app-sidebar />
+    </aside>
+
+    <div class="flex min-w-0 flex-1 flex-col">
+      <header class="sticky top-0 z-10 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+        <app-topbar />
+      </header>
+
+      <main class="flex-1 p-4 md:p-6">
+        <router-outlet />
+      </main>
+    </div>
+  </div>
+</div>

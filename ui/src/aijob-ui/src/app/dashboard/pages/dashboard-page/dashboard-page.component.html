@@ -1,0 +1,79 @@
+<p>dashboard-page works!</p>
+<section class="space-y-6">
+  <div class="flex items-end justify-between gap-4">
+    <div>
+      <h1 class="text-xl font-semibold">Overview</h1>
+      <p class="mt-1 text-sm text-slate-400">Mock data for now. API integration next.</p>
+    </div>
+
+    <div class="text-xs text-slate-500">Updated: just now</div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    @for (k of kpis; track k.label) {
+      <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+        <div class="text-xs text-slate-400">{{ k.label }}</div>
+        <div class="mt-2 flex items-end justify-between">
+          <div class="text-2xl font-semibold">{{ k.value }}</div>
+          <div class="text-xs text-emerald-400">{{ k.delta }}</div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 xl:grid-cols-3">
+    <div class="rounded-xl border border-slate-800 bg-slate-950 p-4 xl:col-span-2">
+      <div class="mb-3 flex items-center justify-between">
+        <div class="text-sm font-medium">Jobs trend</div>
+        <div class="text-xs text-slate-500">(ApexCharts next)</div>
+      </div>
+      <div class="h-64 rounded-lg bg-slate-900/40"></div>
+    </div>
+
+    <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+      <div class="mb-3 text-sm font-medium">Top locations</div>
+      <ul class="space-y-2 text-sm text-slate-300">
+        <li class="flex justify-between"><span>Remote</span><span class="text-slate-400">42%</span></li>
+        <li class="flex justify-between"><span>US</span><span class="text-slate-400">29%</span></li>
+        <li class="flex justify-between"><span>EU</span><span class="text-slate-400">18%</span></li>
+        <li class="flex justify-between"><span>APAC</span><span class="text-slate-400">11%</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+    <div class="mb-3 text-sm font-medium">Recent jobs</div>
+    <div class="overflow-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="text-xs text-slate-400">
+          <tr>
+            <th class="py-2 pr-4">Title</th>
+            <th class="py-2 pr-4">Company</th>
+            <th class="py-2 pr-4">Location</th>
+            <th class="py-2 pr-4">Posted</th>
+          </tr>
+        </thead>
+        <tbody class="text-slate-200">
+          <tr class="border-t border-slate-800">
+            <td class="py-2 pr-4">Senior Fullstack Engineer</td>
+            <td class="py-2 pr-4">Acme</td>
+            <td class="py-2 pr-4">Remote</td>
+            <td class="py-2 pr-4 text-slate-400">1d</td>
+          </tr>
+          <tr class="border-t border-slate-800">
+            <td class="py-2 pr-4">Data Engineer</td>
+            <td class="py-2 pr-4">Northwind</td>
+            <td class="py-2 pr-4">US</td>
+            <td class="py-2 pr-4 text-slate-400">2d</td>
+          </tr>
+          <tr class="border-t border-slate-800">
+            <td class="py-2 pr-4">ML Engineer</td>
+            <td class="py-2 pr-4">Contoso</td>
+            <td class="py-2 pr-4">EU</td>
+            <td class="py-2 pr-4 text-slate-400">3d</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
