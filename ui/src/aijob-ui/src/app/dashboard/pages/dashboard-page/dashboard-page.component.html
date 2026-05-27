@@ -25,9 +25,23 @@
     <div class="rounded-xl border border-slate-800 bg-slate-950 p-4 xl:col-span-2">
       <div class="mb-3 flex items-center justify-between">
         <div class="text-sm font-medium">Jobs trend</div>
-        <div class="text-xs text-slate-500">(ApexCharts next)</div>
+        <div class="text-xs text-slate-500">Last 12 weeks</div>
       </div>
-      <div class="h-64 rounded-lg bg-slate-900/40"></div>
+
+      <div class="overflow-hidden rounded-lg bg-slate-900/30 p-2">
+        <apx-chart
+          [series]="chartOptions.series"
+          [chart]="chartOptions.chart"
+          [xaxis]="chartOptions.xaxis"
+          [yaxis]="chartOptions.yaxis"
+          [grid]="chartOptions.grid"
+          [stroke]="chartOptions.stroke"
+          [dataLabels]="chartOptions.dataLabels"
+          [fill]="chartOptions.fill"
+          [tooltip]="chartOptions.tooltip"
+          [colors]="chartOptions.colors"
+        />
+      </div>
     </div>
 
     <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
