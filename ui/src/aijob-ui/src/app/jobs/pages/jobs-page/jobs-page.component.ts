@@ -6,6 +6,7 @@ import {
 } from '../../components/jobs-filters/jobs-filters.component';
 import { JobsTableComponent, UiJob } from '../../components/jobs-table/jobs-table.component';
 import { JobsApiService } from '../../../services/jobs-api.service';
+import { JobRawDto } from '../../../models/job.models';
 
 @Component({
   selector: 'app-jobs-page',
@@ -21,33 +22,10 @@ export class JobsPageComponent {
     remoteOnly: true
   });
 
-  // Backend-loaded jobs (mapped to UiJob). Falls back to mock data if API is unavailable.
-  private readonly allJobs = signal<UiJob[]>([
-    {
-      title: 'Senior Fullstack Engineer',
-      company: 'Acme',
-      location: 'Remote',
-      posted: '1d',
-      salary: '$140k–$180k',
-      skills: ['TypeScript', 'Angular', 'Node.js']
-    },
-    {
-      title: 'Data Engineer',
-      company: 'Northwind',
-      location: 'US',
-      posted: '2d',
-      salary: '$120k–$160k',
-      skills: ['Python', 'Spark', 'AWS']
-    },
-    {
-      title: 'ML Engineer',
-      company: 'Contoso',
-      location: 'EU',
-      posted: '3d',
-      salary: '$150k–$210k',
-      skills: ['PyTorch', 'LLMs', 'Kubernetes']
-    }
-  ]);
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
+
+  private readonly allJobs = signal<UiJob[]>([]);
 
   readonly jobs = computed(() => {
     const f = this.filters();
@@ -82,24 +60,32 @@ export class JobsPageComponent {
   }
 
   refresh() {
-    this.jobsApi.list().subscribe({
-      next: (rows) => {
-        const mapped: UiJob[] = (rows ?? []).map((r) => ({
-          title: r.title,
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.jobsApi.list({ pageNumber: 1, pageSize: 50 }).subscribe({
+      next: (res) => {
+        const rows: JobRawDto[] = res.jobs ?? [];
+        const mapped: UiJob[] = rows.map((r) => ({
+          title: r.title ?? '—',
           company: r.company ?? r.source ?? '—',
-          location: r.location ?? '—',
-          posted: r.publishedAt ? new Date(r.publishedAt).toLocaleDateString() : '—',
-          salary:
-            r.minSalary || r.maxSalary
-              ? `${r.salaryCurrency ?? ''} ${r.minSalary ?? ''}–${r.maxSalary ?? ''} ${r.salaryPeriod ?? ''}`.trim()
-              : undefined,
-          skills: r.skills ?? []
+          location: r.location ?? (r.url?.includes('remote') ? 'Remote' : '—'),
+          posted: r.postedDate ? new Date(r.postedDate).toLocaleDateString() : '—',
+          salary: r.salaryRaw ?? undefined,
+          skills: (r.skills ?? [])
+            .map((s) => s.skillName)
+            .filter((x): x is string => !!x)
         }));
 
-        if (mapped.length) this.allJobs.set(mapped);
+        this.allJobs.set(mapped);
+        this.loading.set(false);
       },
-      error: () => {
-        // Keep mock data.
+      error: (e) => {
+        this.loading.set(false);
+        this.error.set('Failed to load jobs from API. Check API base URL / CORS / backend status.');
+        this.allJobs.set([]);
+        // eslint-disable-next-line no-console
+        console.error(e);
       }
     });
   }

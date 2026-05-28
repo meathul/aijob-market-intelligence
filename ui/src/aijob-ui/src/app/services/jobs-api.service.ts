@@ -1,14 +1,30 @@
 import { Injectable } from '@angular/core';
 
 import { ApiClient } from '../core/http/api-client';
-import { JobDto } from '../models/job.models';
+import { JobSearchResultDto } from '../models/job.models';
 
 @Injectable({ providedIn: 'root' })
 export class JobsApiService {
   constructor(private readonly api: ApiClient) {}
 
-  // NOTE: adjust params to match your backend contract.
-  list(params?: { page?: number; pageSize?: number; query?: string }) {
-    return this.api.get<JobDto[]>('/api/jobs', params);
+  list(params?: { pageNumber?: number; pageSize?: number }) {
+    return this.api.get<JobSearchResultDto>('/api/Jobs', params);
+  }
+
+  processed(params?: { pageNumber?: number; pageSize?: number }) {
+    return this.api.get<JobSearchResultDto>('/api/Jobs/processed', params);
+  }
+
+  search(params: {
+    keyword?: string;
+    location?: string;
+    pageNumber?: number;
+    pageSize?: number;
+  }) {
+    return this.api.get<JobSearchResultDto>('/api/Jobs/search', params);
+  }
+
+  getById(id: number) {
+    return this.api.get(`/api/Jobs/${id}`);
   }
 }

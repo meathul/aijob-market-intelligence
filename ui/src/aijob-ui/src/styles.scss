@@ -6,3 +6,104 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* --- Material on dark backgrounds (Tailwind slate) --- */
+:root {
+  --aijob-surface: #020617; /* slate-950 */
+  --aijob-border: #1e293b;  /* slate-800 */
+  --aijob-text: #e2e8f0;    /* slate-200 */
+  --aijob-text-dim: #94a3b8;/* slate-400 */
+}
+
+/* === Tables === */
+.mat-mdc-table {
+  background: transparent;
+}
+
+/* Some Material versions paint the surface on the MDC data-table root, not the <table> */
+.mat-mdc-table,
+.mat-mdc-table .mdc-data-table,
+.mat-mdc-table .mdc-data-table__table {
+  background-color: var(--aijob-surface) !important;
+}
+
+/* Ensure header + cell text uses light colors (MDC sets its own colors). */
+.mat-mdc-table .mdc-data-table__header-cell,
+.mat-mdc-table .mdc-data-table__cell {
+  color: var(--aijob-text) !important;
+}
+
+.mat-mdc-table .mdc-data-table__header-cell {
+  color: var(--aijob-text-dim) !important;
+}
+
+.mat-mdc-header-row,
+.mat-mdc-row {
+  color: var(--aijob-text);
+}
+
+.mat-mdc-header-cell {
+  color: var(--aijob-text-dim) !important;
+  border-bottom-color: rgba(30, 41, 59, 0.8) !important;
+}
+
+.mat-mdc-cell {
+  color: var(--aijob-text) !important;
+  border-bottom-color: rgba(30, 41, 59, 0.5) !important;
+}
+
+/* === Form fields (Search / Select) === */
+/* Field container surface */
+.mat-mdc-form-field .mdc-text-field {
+  background-color: rgba(2, 6, 23, 0.6) !important;
+}
+
+/* Input text / caret */
+.mat-mdc-form-field input.mat-mdc-input-element {
+  color: var(--aijob-text) !important;
+  caret-color: var(--aijob-text) !important;
+}
+
+/* Placeholder */
+.mat-mdc-form-field input.mat-mdc-input-element::placeholder {
+  color: rgba(148, 163, 184, 0.9) !important;
+}
+
+/* Label + icons */
+.mat-mdc-form-field .mat-mdc-form-field-label,
+.mat-mdc-form-field mat-label,
+.mat-mdc-form-field .mat-icon {
+  color: var(--aijob-text-dim) !important;
+}
+
+/* Outline border colors */
+.mat-mdc-form-field .mdc-notched-outline__leading,
+.mat-mdc-form-field .mdc-notched-outline__notch,
+.mat-mdc-form-field .mdc-notched-outline__trailing {
+  border-color: rgba(30, 41, 59, 0.9) !important;
+}
+
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: rgba(99, 102, 241, 0.9) !important; /* indigo */
+}
+
+/* Select text */
+.mat-mdc-select-value,
+.mat-mdc-select-min-line {
+  color: var(--aijob-text) !important;
+}
+
+/* Chips in the Skills column */
+.mat-mdc-standard-chip {
+  --mdc-chip-container-color: rgba(148, 163, 184, 0.12);
+  --mdc-chip-label-text-color: var(--aijob-text);
+  --mdc-chip-outline-color: rgba(148, 163, 184, 0.25);
+}
+
+/* Minor: paginator (if added later) */
+.mat-mdc-paginator {
+  background: transparent;
+  color: var(--aijob-text);
+}

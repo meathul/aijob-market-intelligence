@@ -8,10 +8,14 @@ export class AuthApiService {
   constructor(private readonly api: ApiClient) {}
 
   register(req: RegisterRequest) {
-    return this.api.post<AuthResponse>('/api/auth/register', req);
+    return this.api.post<AuthResponse>('/api/Auth/register', req);
   }
 
   login(req: LoginRequest) {
-    return this.api.post<AuthResponse>('/api/auth/login', req);
+    return this.api.post<AuthResponse>('/api/Auth/login', req);
+  }
+
+  me() {
+    return this.api.get('/api/Auth/me');
   }
 }
