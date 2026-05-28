@@ -120,7 +120,26 @@ builder.Services.AddScoped<IJobQueryService, JobQueryService>();
 
 // Register Adzuna provider (real job data from free Adzuna API)
 builder.Services.AddScoped<AdzunaJobProvider>();
-builder.Services.AddScoped<IJobProvider>(sp => sp.GetRequiredService<AdzunaJobProvider>());
+
+// NEW: Live Adzuna provider (requires ADZUNA_APP_ID/ADZUNA_APP_KEY)
+builder.Services.AddHttpClient<AdzunaLiveJobProvider>();
+
+// Feature-flag provider selection (default keeps existing behavior)
+// JOB_PROVIDER=adzuna_live to enable live Adzuna ingestion
+builder.Services.AddScoped<IJobProvider>(sp =>
+{
+    var cfg = sp.GetRequiredService<IConfiguration>();
+    var selected = (cfg["JOB_PROVIDER"] ?? Environment.GetEnvironmentVariable("JOB_PROVIDER") ?? "").Trim();
+
+    if (string.Equals(selected, "adzuna_live", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(selected, "live", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(selected, "adzuna", StringComparison.OrdinalIgnoreCase))
+    {
+        return sp.GetRequiredService<AdzunaLiveJobProvider>();
+    }
+
+    return sp.GetRequiredService<AdzunaJobProvider>();
+});
 
 // Register job ingestion service
 builder.Services.AddScoped<IJobIngestionService, JobIngestionService>();
