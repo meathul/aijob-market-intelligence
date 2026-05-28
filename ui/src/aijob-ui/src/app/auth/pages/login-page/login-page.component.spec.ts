@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { of, throwError } from 'rxjs';
 
 import { LoginPageComponent } from './login-page.component';
@@ -7,11 +8,7 @@ import { AuthApiService } from '../../../services/auth-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 
 describe('LoginPageComponent', () => {
-  it('should show error when admin mode but roles do not include Admin', async () => {
-    const authApi = {
-      login: () => of({ accessToken: 't', roles: ['User'], email: 'u@x.com' })
-    } as Partial<AuthApiService>;
-
+  async function setup(authApi: Partial<AuthApiService>) {
     const auth = {
       setAuth: jasmine.createSpy('setAuth')
     } as unknown as AuthService;
@@ -21,7 +18,7 @@ describe('LoginPageComponent', () => {
     } as unknown as Router;
 
     await TestBed.configureTestingModule({
-      imports: [LoginPageComponent],
+      imports: [LoginPageComponent, RouterTestingModule],
       providers: [
         { provide: AuthApiService, useValue: authApi },
         { provide: AuthService, useValue: auth },
@@ -30,6 +27,14 @@ describe('LoginPageComponent', () => {
     }).compileComponents();
 
     const fixture = TestBed.createComponent(LoginPageComponent);
+    return { fixture, auth, router };
+  }
+
+  it('should show error when admin mode but roles do not include Admin', async () => {
+    const { fixture, auth, router } = await setup({
+      login: () => of({ accessToken: 't', roles: ['User'], email: 'u@x.com' })
+    });
+
     fixture.componentInstance.mode.set('admin');
     fixture.componentInstance.email.set('u@x.com');
     fixture.componentInstance.password.set('p');
@@ -42,28 +47,10 @@ describe('LoginPageComponent', () => {
   });
 
   it('should set auth and navigate on success', async () => {
-    const authApi = {
+    const { fixture, auth, router } = await setup({
       login: () => of({ accessToken: 't', roles: ['User'], email: 'u@x.com' })
-    } as Partial<AuthApiService>;
+    });
 
-    const auth = {
-      setAuth: jasmine.createSpy('setAuth')
-    } as unknown as AuthService;
-
-    const router = {
-      navigateByUrl: jasmine.createSpy('navigateByUrl').and.resolveTo(true)
-    } as unknown as Router;
-
-    await TestBed.configureTestingModule({
-      imports: [LoginPageComponent],
-      providers: [
-        { provide: AuthApiService, useValue: authApi },
-        { provide: AuthService, useValue: auth },
-        { provide: Router, useValue: router }
-      ]
-    }).compileComponents();
-
-    const fixture = TestBed.createComponent(LoginPageComponent);
     fixture.componentInstance.mode.set('user');
     fixture.componentInstance.email.set('u@x.com');
     fixture.componentInstance.password.set('p');
@@ -79,28 +66,10 @@ describe('LoginPageComponent', () => {
   });
 
   it('should surface api errors', async () => {
-    const authApi = {
+    const { fixture, auth } = await setup({
       login: () => throwError(() => new Error('bad credentials'))
-    } as Partial<AuthApiService>;
+    });
 
-    const auth = {
-      setAuth: jasmine.createSpy('setAuth')
-    } as unknown as AuthService;
-
-    const router = {
-      navigateByUrl: jasmine.createSpy('navigateByUrl').and.resolveTo(true)
-    } as unknown as Router;
-
-    await TestBed.configureTestingModule({
-      imports: [LoginPageComponent],
-      providers: [
-        { provide: AuthApiService, useValue: authApi },
-        { provide: AuthService, useValue: auth },
-        { provide: Router, useValue: router }
-      ]
-    }).compileComponents();
-
-    const fixture = TestBed.createComponent(LoginPageComponent);
     fixture.componentInstance.email.set('u@x.com');
     fixture.componentInstance.password.set('p');
 

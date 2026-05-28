@@ -74,7 +74,9 @@
 
         <div class="text-sm text-slate-400">
           No account?
-          <a class="text-indigo-300 hover:underline" [routerLink]="['/auth/register']">Register</a>
+          <button type="button" class="text-indigo-300 hover:underline" (click)="goToRegister()">
+            Register
+          </button>
         </div>
       </div>
     </div>

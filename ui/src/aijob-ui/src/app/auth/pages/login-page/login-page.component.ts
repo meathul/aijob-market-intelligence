@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 
 import { AuthApiService } from '../../../services/auth-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -11,7 +11,7 @@ type LoginMode = 'user' | 'admin';
 @Component({
   selector: 'app-login-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './login-page.component.html'
 })
 export class LoginPageComponent {
@@ -29,6 +29,10 @@ export class LoginPageComponent {
   readonly title = computed(() =>
     this.mode() === 'admin' ? 'Admin Login' : 'User Login'
   );
+
+  async goToRegister() {
+    await this.router.navigateByUrl('/auth/register');
+  }
 
   async submit() {
     this.error.set(null);
