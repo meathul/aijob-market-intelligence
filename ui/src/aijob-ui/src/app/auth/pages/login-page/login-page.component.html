@@ -1,0 +1,82 @@
+<div class="min-h-dvh bg-slate-950 text-slate-100">
+  <div class="mx-auto flex min-h-dvh max-w-screen-sm flex-col justify-center p-6">
+    <div class="rounded-2xl border border-slate-800 bg-slate-950 p-6 shadow">
+      <div class="mb-6">
+        <div class="text-sm font-semibold tracking-wide text-slate-300">AI Job</div>
+        <div class="mt-1 text-2xl font-semibold">{{ title() }}</div>
+        <div class="mt-2 text-sm text-slate-400">
+          Choose login type and enter credentials.
+        </div>
+      </div>
+
+      <div class="mb-4 flex gap-2">
+        <button
+          type="button"
+          class="flex-1 rounded-lg border border-slate-800 px-3 py-2 text-sm"
+          [class.bg-indigo-600]="mode() === 'user'"
+          [class.text-white]="mode() === 'user'"
+          [class.bg-slate-900]="mode() !== 'user'"
+          [class.text-slate-200]="mode() !== 'user'"
+          (click)="mode.set('user')"
+        >
+          User
+        </button>
+        <button
+          type="button"
+          class="flex-1 rounded-lg border border-slate-800 px-3 py-2 text-sm"
+          [class.bg-indigo-600]="mode() === 'admin'"
+          [class.text-white]="mode() === 'admin'"
+          [class.bg-slate-900]="mode() !== 'admin'"
+          [class.text-slate-200]="mode() !== 'admin'"
+          (click)="mode.set('admin')"
+        >
+          Admin
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs text-slate-400">Email</label>
+          <input
+            class="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-indigo-500"
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event)"
+            type="email"
+            autocomplete="username"
+          />
+        </div>
+
+        <div>
+          <label class="text-xs text-slate-400">Password</label>
+          <input
+            class="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-indigo-500"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            type="password"
+            autocomplete="current-password"
+          />
+        </div>
+
+        @if (error()) {
+          <div class="rounded-lg border border-rose-900/50 bg-rose-950/30 p-3 text-sm text-rose-200">
+            {{ error() }}
+          </div>
+        }
+
+        <button
+          type="button"
+          class="w-full rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-60"
+          [disabled]="loading()"
+          (click)="submit()"
+        >
+          {{ loading() ? 'Signing in…' : 'Sign in' }}
+        </button>
+
+        <div class="text-sm text-slate-400">
+          No account?
+          <a class="text-indigo-300 hover:underline" [routerLink]="['/auth/register']">Register</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

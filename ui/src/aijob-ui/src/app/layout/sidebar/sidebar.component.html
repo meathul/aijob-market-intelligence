@@ -16,10 +16,45 @@
         {{ item.label }}
       </a>
     }
+
+    <!-- Admin-only links (rendered only if the user has Admin role) -->
+    @if (isAdmin()) {
+      <a
+        class="block rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-slate-900 hover:text-white"
+        routerLink="/reports"
+        routerLinkActive="bg-slate-900 text-white"
+      >
+        Reports
+      </a>
+      <a
+        class="block rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-slate-900 hover:text-white"
+        routerLink="/insights"
+        routerLinkActive="bg-slate-900 text-white"
+      >
+        AI Insights
+      </a>
+    }
   </nav>
+
+  <div class="mt-4 space-y-2">
+    <a
+      class="block rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-200 hover:bg-slate-900"
+      routerLink="/auth/login"
+    >
+      Switch account
+    </a>
+
+    <button
+      type="button"
+      class="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-900"
+      (click)="logout()"
+    >
+      Logout
+    </button>
+  </div>
 
   <div class="mt-6 rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-slate-400">
     <div class="font-medium text-slate-300">Status</div>
-    <div class="mt-1">Mock-first UI. API wiring next.</div>
+    <div class="mt-1">API-connected UI.</div>
   </div>
 </div>

@@ -9,7 +9,8 @@ export type RegisterRequest = {
 };
 
 export type AuthResponse = {
-  token: string;
+  accessToken?: string;
+  token?: string;
   expiresAtUtc?: string;
   email?: string;
   roles?: string[];

@@ -1,8 +1,31 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './auth/guards/auth.guard';
+import { adminGuard } from './auth/guards/admin.guard';
 
 export const routes: Routes = [
   {
+    path: 'auth',
+    children: [
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('./auth/pages/login-page/login-page.component').then(
+            (m) => m.LoginPageComponent
+          )
+      },
+      {
+        path: 'register',
+        loadComponent: () =>
+          import('./auth/pages/register-page/register-page.component').then(
+            (m) => m.RegisterPageComponent
+          )
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'login' }
+    ]
+  },
+  {
     path: '',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./layout/shell/shell.component').then((m) => m.ShellComponent),
     children: [
@@ -41,6 +64,7 @@ export const routes: Routes = [
       },
       {
         path: 'reports',
+        canActivate: [adminGuard],
         loadComponent: () =>
           import('./reports/pages/reports-page/reports-page.component').then(
             (m) => m.ReportsPageComponent
@@ -48,6 +72,7 @@ export const routes: Routes = [
       },
       {
         path: 'insights',
+        canActivate: [adminGuard],
         loadComponent: () =>
           import('./insights/pages/insights-page/insights-page.component').then(
             (m) => m.InsightsPageComponent

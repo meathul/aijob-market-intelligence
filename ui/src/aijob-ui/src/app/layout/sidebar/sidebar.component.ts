@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+
+import { AuthService } from '../../core/auth/auth.service';
 
 type NavItem = {
   label: string;
@@ -14,12 +16,18 @@ type NavItem = {
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
+  private readonly auth = inject(AuthService);
+
+  readonly isAdmin = computed(() => (this.auth.state()?.roles ?? []).includes('Admin'));
+
   readonly nav: NavItem[] = [
     { label: 'Dashboard', path: '/dashboard' },
     { label: 'Jobs', path: '/jobs' },
     { label: 'Skills', path: '/skills' },
-    { label: 'Salary', path: '/salary' },
-    { label: 'Reports', path: '/reports' },
-    { label: 'AI Insights', path: '/insights' }
+    { label: 'Salary', path: '/salary' }
   ];
+
+  logout() {
+    this.auth.logout();
+  }
 }

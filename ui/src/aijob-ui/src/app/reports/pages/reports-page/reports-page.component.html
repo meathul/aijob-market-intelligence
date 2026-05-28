@@ -1,7 +1,42 @@
 <p>reports-page works!</p>
 <section class="space-y-4">
   <h1 class="text-xl font-semibold">Reports</h1>
-  <div class="rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm text-slate-300">
-    Saved reports + export center will go here.
+
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+      <div class="text-sm font-medium text-slate-100">Top Sources</div>
+      <div class="mt-3 space-y-2 text-sm">
+        @for (r of sources(); track r.key) {
+          <div class="flex items-center justify-between gap-3">
+            <span class="truncate text-slate-200">{{ r.key ?? 'Unknown' }}</span>
+            <span class="text-slate-400">{{ r.count }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+      <div class="text-sm font-medium text-slate-100">Top Locations</div>
+      <div class="mt-3 space-y-2 text-sm">
+        @for (r of locations(); track r.key) {
+          <div class="flex items-center justify-between gap-3">
+            <span class="truncate text-slate-200">{{ r.key ?? 'Unknown' }}</span>
+            <span class="text-slate-400">{{ r.count }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+      <div class="text-sm font-medium text-slate-100">Experience Levels</div>
+      <div class="mt-3 space-y-2 text-sm">
+        @for (r of experience(); track r.key) {
+          <div class="flex items-center justify-between gap-3">
+            <span class="truncate text-slate-200">{{ r.key ?? 'Unknown' }}</span>
+            <span class="text-slate-400">{{ r.count }}</span>
+          </div>
+        }
+      </div>
+    </div>
   </div>
 </section>
