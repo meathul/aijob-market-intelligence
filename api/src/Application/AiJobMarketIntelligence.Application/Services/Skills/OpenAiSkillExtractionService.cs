@@ -79,26 +79,74 @@ Be thorough but return only legitimate technical skills that are clearly mention
             var response = await _chatClient.CompleteChatAsync(messages);
 
             // Parse the response
-            var skillsText = response.Value.Content[0].Text;
-            _logger.LogDebug($"OpenAI Response: {skillsText}");
+            var skillsText = response.Value.Content[0].Text ?? string.Empty;
+            _logger.LogDebug("OpenAI Response: {Response}", skillsText);
+
+            // Filter out common non-skill/policy/boilerplate responses
+            if (IsNonSkillResponse(skillsText))
+            {
+                _logger.LogInformation("OpenAI returned a non-skill response; ignoring.");
+                return new List<string>();
+            }
 
             // Split and clean up skills
             var skills = skillsText
                 .Split(new[] { ',', ';', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(s => s.Trim())
-                .Where(s => !string.IsNullOrWhiteSpace(s) && s.Length > 1) // Filter out single characters
+                .Select(NormalizeToken)
+                .Where(s => !string.IsNullOrWhiteSpace(s) && s.Length > 1)
+                .Where(s => !IsNonSkillToken(s))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-            _logger.LogInformation($"Extracted {skills.Count} skills: {string.Join(", ", skills)}");
+            _logger.LogInformation("Extracted {Count} skills: {Skills}", skills.Count, string.Join(", ", skills));
 
             return skills;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error extracting skills from job description");
-            // Return empty list instead of throwing to allow job processing to continue
             return new List<string>();
         }
+    }
+
+    private static string NormalizeToken(string token)
+    {
+        var s = (token ?? string.Empty).Trim();
+        s = s.Trim('"', '\'', '`', '-', '•');
+        s = s.Replace("\r", " ").Replace("\t", " ");
+        s = string.Join(' ', s.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+        return s;
+    }
+
+    private static bool IsNonSkillResponse(string text)
+    {
+        var t = (text ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(t)) return true;
+
+        var tl = t.ToLowerInvariant();
+        return tl.Contains("sorry, i can't assist")
+            || tl.Contains("i can't assist")
+            || tl.Contains("cannot assist")
+            || tl.Contains("no technical skills")
+            || tl.Contains("no specific technical skills")
+            || tl.Contains("no technical skills mentioned")
+            || tl.Contains("no technical skills found")
+            || tl.Contains("there are no specific technical skills")
+            || tl.Contains("not mentioned") && tl.Contains("technical skills");
+    }
+
+    private static bool IsNonSkillToken(string token)
+    {
+        var tl = token.ToLowerInvariant();
+        return tl is "none"
+            || tl is "n/a"
+            || tl.Contains("no technical skills")
+            || tl.Contains("no specific technical skills")
+            || tl.Contains("no technical skills mentioned")
+            || tl.Contains("no technical skills found")
+            || tl.Contains("there are no specific technical skills")
+            || tl.Contains("sorry")
+            || tl.Contains("can't assist")
+            || tl.Contains("cannot assist");
     }
 }

@@ -1,0 +1,21 @@
+/* Dark-theme overrides for Angular Material chips in the Jobs table */
+
+:host ::ng-deep mat-chip-set {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+:host ::ng-deep mat-chip {
+  background: rgba(30, 41, 59, 0.9) !important; /* slate-800-ish */
+  color: #e2e8f0 !important; /* slate-200 */
+  border: 1px solid rgba(51, 65, 85, 0.85) !important; /* slate-700 */
+}
+
+:host ::ng-deep mat-chip .mdc-evolution-chip__text-label {
+  color: #e2e8f0 !important;
+}
+
+:host ::ng-deep mat-chip .mat-mdc-chip-action {
+  color: inherit;
+}

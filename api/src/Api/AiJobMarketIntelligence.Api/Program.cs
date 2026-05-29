@@ -150,7 +150,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy("Development", corsPolicyBuilder =>
     {
         corsPolicyBuilder
-            .AllowAnyOrigin()
+            // Explicit localhost origins (safer than AllowAnyOrigin when auth headers/cookies are involved)
+            .WithOrigins(
+                "http://localhost:4200",
+                "http://127.0.0.1:4200",
+                "http://localhost:5173",
+                "http://127.0.0.1:5173")
             .AllowAnyMethod()
             .AllowAnyHeader();
     });
@@ -185,6 +190,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// CORS must be applied before auth endpoints are hit
 app.UseCors("Development");
 
 app.UseAuthentication();
