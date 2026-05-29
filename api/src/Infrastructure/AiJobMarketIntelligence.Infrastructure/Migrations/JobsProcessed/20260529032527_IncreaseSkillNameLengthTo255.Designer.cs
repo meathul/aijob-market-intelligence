@@ -4,16 +4,19 @@ using AiJobMarketIntelligence.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace AiJobMarketIntelligence.Infrastructure.Migrations
+namespace AiJobMarketIntelligence.Infrastructure.Migrations.JobsProcessed
 {
     [DbContext(typeof(AiJobContext))]
-    partial class AiJobContextModelSnapshot : ModelSnapshot
+    [Migration("20260529032527_IncreaseSkillNameLengthTo255")]
+    partial class IncreaseSkillNameLengthTo255
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

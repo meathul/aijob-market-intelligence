@@ -50,6 +50,14 @@ public sealed class JobProcessingService : IJobProcessingService
             {
                 // Salary parsing from raw field and/or description.
                 var salary = _salaryParser.Parse(raw.SalaryRaw, raw.Description);
+                _logger.LogDebug(
+                    "Salary parse for job {JobRawId}: raw='{SalaryRaw}' => min={Min}, max={Max}, cur={Cur}, period={Period}",
+                    raw.Id,
+                    raw.SalaryRaw,
+                    salary.SalaryMin,
+                    salary.SalaryMax,
+                    salary.Currency,
+                    salary.SalaryPeriod);
 
                 // Experience level (heuristic) from description/title.
                 var exp = InferExperienceLevel(raw.Title, raw.Description);
@@ -67,16 +75,28 @@ public sealed class JobProcessingService : IJobProcessingService
 
                 await _jobProcessedRepository.UpsertByRawJobIdAsync(processed);
 
-                // Extract skills from job description and title
-                var skills = await _skillExtractor.ExtractSkillsAsync(raw.Description, raw.Title);
-                
+                // Extract skills from job description and title (ensure we provide useful text)
+                var title = raw.Title ?? string.Empty;
+                var desc = raw.Description ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(desc) && !string.IsNullOrWhiteSpace(title))
+                    desc = title;
+                if (string.IsNullOrWhiteSpace(title) && !string.IsNullOrWhiteSpace(desc))
+                    title = desc.Length > 80 ? desc[..80] : desc;
+
+                var skills = await _skillExtractor.ExtractSkillsAsync(desc, title);
+
+                // Filter obvious bad outputs (paragraphs, etc.)
+                skills = skills
+                    .Where(s => !string.IsNullOrWhiteSpace(s) && s.Trim().Length <= 255)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
                 if (skills.Count > 0)
                 {
-                    // Associate skills with the job
                     foreach (var skillName in skills)
                     {
                         await _skillRepository.AddJobSkillAsync(raw.Id, skillName);
-                        _logger.LogDebug($"Skill '{skillName}' extracted for job {raw.Id}");
+                        _logger.LogDebug("Skill '{Skill}' extracted for job {JobRawId}", skillName, raw.Id);
                     }
                 }
 
@@ -87,7 +107,6 @@ public sealed class JobProcessingService : IJobProcessingService
             }
             catch (Exception ex)
             {
-                // Keep raw job unprocessed so it can be retried later.
                 _logger.LogError(ex, "Failed to process raw job {JobRawId}", raw.Id);
             }
         }

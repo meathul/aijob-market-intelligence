@@ -10,6 +10,8 @@ namespace AiJobMarketIntelligence.Infrastructure.Repositories;
 
 public class SkillRepository : ISkillRepository
 {
+    private const int SkillNameMaxLen = 255;
+
     private readonly AiJobContext _context;
 
     public SkillRepository(AiJobContext context)
@@ -57,6 +59,10 @@ public class SkillRepository : ISkillRepository
 
     public async Task AddJobSkillAsync(int jobRawId, string skillName)
     {
+        skillName = NormalizeSkillName(skillName);
+        if (string.IsNullOrWhiteSpace(skillName))
+            return;
+
         // Check if skill exists
         var skill = await GetByNameAsync(skillName);
         if (skill == null)
@@ -80,6 +86,26 @@ public class SkillRepository : ISkillRepository
             };
             await _context.JobSkills.AddAsync(jobSkill);
         }
+    }
+
+    private static string NormalizeSkillName(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+            return string.Empty;
+
+        // Common cleanup when LLM returns bullets/quotes/newlines.
+        var s = raw.Trim();
+        s = s.Trim('"', '\'', '`');
+        s = s.Replace("\r", " ").Replace("\n", " ").Replace("\t", " ");
+
+        // Collapse whitespace
+        s = string.Join(' ', s.Split(' ', System.StringSplitOptions.RemoveEmptyEntries));
+
+        // Hard cap to DB max length
+        if (s.Length > SkillNameMaxLen)
+            s = s[..SkillNameMaxLen];
+
+        return s;
     }
 
     public async Task<List<JobSkill>> GetJobSkillsByJobRawIdAsync(int jobRawId)

@@ -130,7 +130,7 @@ public class AiJobContext : DbContext
 
             entity.Property(e => e.Name)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(255);
 
             // Unique constraint on skill name
             entity.HasIndex(e => e.Name)

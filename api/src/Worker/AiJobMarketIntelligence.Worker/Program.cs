@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using DotNetEnv;
+// Remove API bootstrap reference
+// using AiJobMarketIntelligence.Api.Services;
 using AiJobMarketIntelligence.Worker;
 using AiJobMarketIntelligence.Infrastructure.Data;
 using AiJobMarketIntelligence.Infrastructure.Repositories;
@@ -12,13 +13,31 @@ using AiJobMarketIntelligence.Application.Services.Processing;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-// Load environment variables from .env file (repo root)
-var envPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "..", "..", "..", "..", "..", ".env"));
-Env.Load(envPath);
+// Load environment variables from .env (search upward from output directory/repo)
+DotEnvBootstrap.LoadFromRepoRoot(AppContext.BaseDirectory);
+
+// Make sure environment variables are part of configuration consistently.
 builder.Configuration.AddEnvironmentVariables();
+
+// Minimal startup diagnostics (does not print secrets)
+{
+    var dotenvMissing = Environment.GetEnvironmentVariable("AIJOB_DOTENV_NOT_FOUND") == "1";
+    var apiKeyPresent = !string.IsNullOrWhiteSpace(
+        builder.Configuration["OPENAI_API_KEY"] ?? Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
+
+    if (dotenvMissing)
+        builder.Logging.AddConsole();
+
+    var logger = LoggerFactory.Create(lb => lb.AddConsole()).CreateLogger("WorkerStartup");
+    logger.LogInformation(".env loaded: {DotEnvLoaded}; OPENAI_API_KEY present: {OpenAiKeyPresent}", !dotenvMissing, apiKeyPresent);
+}
 
 // Configure Entity Framework Core with MySQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? builder.Configuration["ConnectionStrings:DefaultConnection"]
+    ?? builder.Configuration["ConnectionStrings__DefaultConnection"]
+    ?? builder.Configuration["DB_CONNECTION_STRING"]
+    ?? Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<AiJobContext>(options =>
@@ -36,7 +55,8 @@ builder.Services.AddScoped<IJobProcessedRepository, JobProcessedRepository>();
 builder.Services.AddSingleton<ISalaryParserService, SalaryParserService>();
 
 // Register OpenAI skill extraction service
-var openAiApiKey = builder.Configuration["OpenAI:ApiKey"]
+var openAiApiKey = builder.Configuration["OPENAI_API_KEY"]
+    ?? builder.Configuration["OpenAI:ApiKey"]
     ?? Environment.GetEnvironmentVariable("OPENAI_API_KEY")
     ?? throw new InvalidOperationException("OpenAI API key is required. Set it via configuration or OPENAI_API_KEY environment variable.");
 

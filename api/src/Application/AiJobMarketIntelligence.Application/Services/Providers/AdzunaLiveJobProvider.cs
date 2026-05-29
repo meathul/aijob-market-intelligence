@@ -65,7 +65,11 @@ public sealed class AdzunaLiveJobProvider : IJobProvider
         _logger.LogInformation("Fetching live jobs from Adzuna API: country={Country}, what={What}, where={Where}, resultsPerPage={Results}", country, what, where, resultsPerPage);
 
         using var resp = await _http.GetAsync(url);
-        var body = await resp.Content.ReadAsStringAsync();
+
+        // Adzuna sometimes returns Content-Type charset=utf8 (non-standard). .NET treats that as invalid.
+        // Read bytes and decode explicitly to avoid relying on the response charset.
+        var bytes = await resp.Content.ReadAsByteArrayAsync();
+        var body = System.Text.Encoding.UTF8.GetString(bytes);
 
         if (!resp.IsSuccessStatusCode)
         {
@@ -78,9 +82,16 @@ public sealed class AdzunaLiveJobProvider : IJobProvider
             using var doc = JsonDocument.Parse(body);
             var root = doc.RootElement;
 
-            if (!root.TryGetProperty("results", out var resultsEl) || resultsEl.ValueKind != JsonValueKind.Array)
+            // Adzuna responses should contain a 'results' array, but in case of plan/region differences
+            // or wrapper responses, try a couple of known/nested locations.
+            JsonElement resultsEl;
+            if (!TryGetArray(root, out resultsEl, "results") &&
+                !TryGetArray(root, out resultsEl, "data", "results") &&
+                !TryGetArray(root, out resultsEl, "response", "results"))
             {
-                _logger.LogWarning("Adzuna response missing 'results' array.");
+                _logger.LogWarning("Adzuna response did not contain a results array. Top-level properties: {Props}. Body (truncated): {Body}",
+                    string.Join(",", root.EnumerateObject().Select(p => p.Name)),
+                    Truncate(body, 1000));
                 return new List<JobRaw>();
             }
 
@@ -238,4 +249,29 @@ public sealed class AdzunaLiveJobProvider : IJobProvider
 
     private static string Truncate(string s, int max)
         => s.Length <= max ? s : s[..max] + "...";
+
+    private static bool TryGetArray(JsonElement root, out JsonElement array, params string[] path)
+    {
+        array = default;
+
+        try
+        {
+            var current = root;
+            foreach (var p in path)
+            {
+                if (!current.TryGetProperty(p, out current))
+                    return false;
+            }
+
+            if (current.ValueKind != JsonValueKind.Array)
+                return false;
+
+            array = current;
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }
