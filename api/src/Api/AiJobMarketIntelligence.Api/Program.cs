@@ -16,6 +16,8 @@ using System.Text;
 using AiJobMarketIntelligence.Api.Services;
 using AiJobMarketIntelligence.Infrastructure.Repositories.UserPreferences;
 using AiJobMarketIntelligence.Application.Interfaces.Repositories.UserPreferences;
+using AiJobMarketIntelligence.Application.Interfaces.Services.Recommendations;
+using AiJobMarketIntelligence.Application.Services.Recommendations;
 
 // Load .env before building configuration (so builder.Configuration sees these as env vars)
 DotEnvBootstrap.LoadFromRepoRoot(Directory.GetCurrentDirectory());
@@ -120,6 +122,9 @@ builder.Services.AddScoped<IJobProcessingService, JobProcessingService>();
 
 // Register job query service
 builder.Services.AddScoped<IJobQueryService, JobQueryService>();
+
+// Recommendations (AI ranking over DB jobs)
+builder.Services.AddScoped<IJobRecommendationService, JobRecommendationService>();
 
 // Register Adzuna provider (real job data from free Adzuna API)
 builder.Services.AddScoped<AdzunaJobProvider>();

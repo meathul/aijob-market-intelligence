@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
 
 import {
@@ -6,16 +7,19 @@ import {
 } from '../../components/jobs-filters/jobs-filters.component';
 import { JobsTableComponent, UiJob } from '../../components/jobs-table/jobs-table.component';
 import { JobsApiService } from '../../../services/jobs-api.service';
+import { JobsRecommendationsApiService } from '../../../services/jobs-recommendations-api.service';
 import { JobRawDto } from '../../../models/job.models';
 
 @Component({
   selector: 'app-jobs-page',
   standalone: true,
-  imports: [JobsFiltersComponent, JobsTableComponent],
+  imports: [CommonModule, JobsFiltersComponent, JobsTableComponent],
   templateUrl: './jobs-page.component.html',
   styleUrl: './jobs-page.component.scss'
 })
 export class JobsPageComponent {
+  readonly mode = signal<'recommended' | 'all'>('recommended');
+
   readonly filters = signal<JobsFilterState>({
     query: '',
     location: 'Any',
@@ -51,7 +55,10 @@ export class JobsPageComponent {
     });
   });
 
-  constructor(private readonly jobsApi: JobsApiService) {
+  constructor(
+    private readonly jobsApi: JobsApiService,
+    private readonly recApi: JobsRecommendationsApiService
+  ) {
     this.refresh();
   }
 
@@ -59,25 +66,42 @@ export class JobsPageComponent {
     this.filters.set(next);
   }
 
+  setMode(next: 'recommended' | 'all') {
+    this.mode.set(next);
+    this.refresh();
+  }
+
   refresh() {
     this.loading.set(true);
     this.error.set(null);
 
+    if (this.mode() === 'recommended') {
+      this.recApi.list({ take: 20 }).subscribe({
+        next: (res) => {
+          const rows: JobRawDto[] = (res.jobs ?? []).map((x: any) => x.job) ?? [];
+          this.allJobs.set(this.map(rows));
+          this.loading.set(false);
+        },
+        error: (e) => {
+          // eslint-disable-next-line no-console
+          console.error(e);
+          this.mode.set('all');
+          this.error.set('Could not load AI recommendations. Showing all jobs instead.');
+          this.loadAll();
+        }
+      });
+
+      return;
+    }
+
+    this.loadAll();
+  }
+
+  private loadAll() {
     this.jobsApi.list({ pageNumber: 1, pageSize: 50 }).subscribe({
       next: (res) => {
         const rows: JobRawDto[] = res.jobs ?? [];
-        const mapped: UiJob[] = rows.map((r) => ({
-          title: r.title ?? '—',
-          company: r.company ?? r.source ?? '—',
-          location: r.location ?? (r.url?.includes('remote') ? 'Remote' : '—'),
-          posted: r.postedDate ? new Date(r.postedDate).toLocaleDateString() : '—',
-          salary: r.salaryRaw ?? undefined,
-          skills: (r.skills ?? [])
-            .map((s) => s.skillName)
-            .filter((x): x is string => !!x)
-        }));
-
-        this.allJobs.set(mapped);
+        this.allJobs.set(this.map(rows));
         this.loading.set(false);
       },
       error: (e) => {
@@ -88,5 +112,19 @@ export class JobsPageComponent {
         console.error(e);
       }
     });
+  }
+
+  private map(rows: JobRawDto[]): UiJob[] {
+    return rows.map((r) => ({
+      title: r.title ?? '—',
+      company: r.company ?? r.source ?? '—',
+      location: r.location ?? (r.url?.includes('remote') ? 'Remote' : '—'),
+      posted: r.postedDate ? new Date(r.postedDate).toLocaleDateString() : '—',
+      salary: r.salaryRaw ?? undefined,
+      skills: (r.skills ?? [])
+        .map((s) => s.skillName)
+        .filter((x): x is string => !!x),
+      url: r.url ?? undefined
+    }));
   }
 }

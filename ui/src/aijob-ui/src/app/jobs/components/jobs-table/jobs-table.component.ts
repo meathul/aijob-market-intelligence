@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 
 import { MatTableModule } from '@angular/material/table';
@@ -10,12 +11,13 @@ export type UiJob = {
   posted: string;
   salary?: string;
   skills?: string[];
+  url?: string;
 };
 
 @Component({
   selector: 'app-jobs-table',
   standalone: true,
-  imports: [MatTableModule, MatChipsModule],
+  imports: [CommonModule, MatTableModule, MatChipsModule],
   templateUrl: './jobs-table.component.html',
   styleUrl: './jobs-table.component.scss'
 })
@@ -30,4 +32,12 @@ export class JobsTableComponent {
     'salary',
     'skills'
   ];
+
+  openJob(row: UiJob) {
+    const url = row.url?.trim();
+    if (!url) return;
+
+    // Use noopener for safety.
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
 }
