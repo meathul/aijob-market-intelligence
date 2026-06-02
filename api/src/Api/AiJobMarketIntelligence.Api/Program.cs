@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using AiJobMarketIntelligence.Api.Services;
+using AiJobMarketIntelligence.Infrastructure.Repositories.UserPreferences;
+using AiJobMarketIntelligence.Application.Interfaces.Repositories.UserPreferences;
 
 // Load .env before building configuration (so builder.Configuration sees these as env vars)
 DotEnvBootstrap.LoadFromRepoRoot(Directory.GetCurrentDirectory());
@@ -101,6 +103,7 @@ builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<ISkillRepository, SkillRepository>();
 builder.Services.AddScoped<IJobProcessedRepository, JobProcessedRepository>();
+builder.Services.AddScoped<IUserJobPreferencesRepository, UserJobPreferencesRepository>();
 
 // Salary parsing + skill extraction + processing pipeline (processing runs in Worker; API reuses services for any ad-hoc processing needs)
 builder.Services.AddSingleton<ISalaryParserService, SalaryParserService>();

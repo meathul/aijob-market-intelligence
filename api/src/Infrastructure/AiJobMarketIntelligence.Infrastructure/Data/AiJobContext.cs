@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using AiJobMarketIntelligence.Domain.Entities;
+using AiJobMarketIntelligence.Domain.Entities.UserPreferences;
 
 namespace AiJobMarketIntelligence.Infrastructure.Data;
 
@@ -20,6 +21,8 @@ public class AiJobContext : DbContext
     public DbSet<Skill> Skills { get; set; }
     
     public DbSet<JobSkill> JobSkills { get; set; }
+
+    public DbSet<UserJobPreferences> UserJobPreferences { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -170,6 +173,38 @@ public class AiJobContext : DbContext
             // Provider-safe check constraint (MySQL-compatible identifiers)
             entity.ToTable("JobSkills", t =>
                 t.HasCheckConstraint("CK_JobSkill_Ids", "JobRawId > 0 AND SkillId > 0"));
+        });
+
+        // Configure UserJobPreferences entity
+        modelBuilder.Entity<UserJobPreferences>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.UserId)
+                .IsRequired()
+                .HasMaxLength(450);
+
+            entity.HasIndex(e => e.UserId)
+                .IsUnique()
+                .HasDatabaseName("IX_UserJobPreferences_UserId_Unique");
+
+            entity.Property(e => e.Location)
+                .HasMaxLength(300);
+
+            entity.Property(e => e.PreferredJobTitle)
+                .HasMaxLength(200);
+
+            entity.Property(e => e.WorkMode)
+                .HasMaxLength(50);
+
+            // Free-text skills
+            entity.Property(e => e.SkillsText)
+                .HasMaxLength(4000);
+
+            entity.Property(e => e.UpdatedAt)
+                .IsRequired()
+                .HasColumnType("timestamp")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
     }
 }

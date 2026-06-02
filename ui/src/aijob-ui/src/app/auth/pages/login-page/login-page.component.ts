@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 
 import { AuthApiService } from '../../../services/auth-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { UserPreferencesApiService } from '../../../services/user-preferences-api.service';
 
 type LoginMode = 'user' | 'admin';
 
@@ -17,6 +18,7 @@ type LoginMode = 'user' | 'admin';
 export class LoginPageComponent {
   private readonly authApi = inject(AuthApiService);
   private readonly auth = inject(AuthService);
+  private readonly prefsApi = inject(UserPreferencesApiService);
   private readonly router = inject(Router);
 
   readonly mode = signal<LoginMode>('user');
@@ -53,7 +55,26 @@ export class LoginPageComponent {
       }
 
       this.auth.setAuth({ token, email: res?.email, roles });
-      await this.router.navigateByUrl('/dashboard');
+
+      // If user hasn't completed onboarding, send them there first.
+      this.prefsApi.get().subscribe({
+        next: async (prefs) => {
+          const hasAny = !!(
+            prefs?.location ||
+            prefs?.preferredJobTitle ||
+            prefs?.preferredSalaryMin ||
+            prefs?.preferredSalaryMax ||
+            prefs?.skillsText ||
+            prefs?.workMode
+          );
+
+          await this.router.navigateByUrl(hasAny ? '/dashboard' : '/onboarding');
+        },
+        error: async () => {
+          // If anything fails, still continue (don't lock the user out).
+          await this.router.navigateByUrl('/dashboard');
+        }
+      });
     } catch (e: any) {
       this.error.set(e?.message ?? 'Login failed');
     } finally {

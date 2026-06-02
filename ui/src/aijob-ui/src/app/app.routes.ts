@@ -35,6 +35,13 @@ export const routes: Routes = [
         redirectTo: 'dashboard'
       },
       {
+        path: 'onboarding',
+        loadComponent: () =>
+          import('./onboarding/pages/profile-setup-page/profile-setup-page.component').then(
+            (m) => m.ProfileSetupPageComponent
+          )
+      },
+      {
         path: 'dashboard',
         loadComponent: () =>
           import('./dashboard/pages/dashboard-page/dashboard-page.component').then(

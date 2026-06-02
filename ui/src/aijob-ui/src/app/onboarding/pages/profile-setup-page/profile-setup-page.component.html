@@ -1,0 +1,86 @@
+<div class="mx-auto max-w-2xl">
+  <h1 class="text-2xl font-semibold">Set up your job preferences</h1>
+  <p class="mt-1 text-sm text-slate-300">
+    This helps us recommend the top 20 jobs from the database for you.
+  </p>
+
+  <div class="mt-6 rounded-xl border border-slate-800 bg-slate-900/40 p-4">
+    <div class="grid gap-4 md:grid-cols-2">
+      <label class="grid gap-1">
+        <span class="text-sm text-slate-200">Location</span>
+        <input
+          class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-slate-500"
+          placeholder="e.g. New York, NY"
+          [ngModel]="location()"
+          (ngModelChange)="location.set($event)" />
+      </label>
+
+      <label class="grid gap-1">
+        <span class="text-sm text-slate-200">Preferred job title</span>
+        <input
+          class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-slate-500"
+          placeholder="e.g. Frontend Engineer"
+          [ngModel]="preferredJobTitle()"
+          (ngModelChange)="preferredJobTitle.set($event)" />
+      </label>
+
+      <label class="grid gap-1">
+        <span class="text-sm text-slate-200">Preferred salary min</span>
+        <input
+          type="number"
+          class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-slate-500"
+          placeholder="e.g. 80000"
+          [ngModel]="preferredSalaryMin()"
+          (ngModelChange)="preferredSalaryMin.set($event === '' ? null : +$event)" />
+      </label>
+
+      <label class="grid gap-1">
+        <span class="text-sm text-slate-200">Preferred salary max</span>
+        <input
+          type="number"
+          class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-slate-500"
+          placeholder="e.g. 120000"
+          [ngModel]="preferredSalaryMax()"
+          (ngModelChange)="preferredSalaryMax.set($event === '' ? null : +$event)" />
+      </label>
+
+      <label class="grid gap-1 md:col-span-2">
+        <span class="text-sm text-slate-200">Work mode</span>
+        <select
+          class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-slate-500"
+          [ngModel]="workMode()"
+          (ngModelChange)="workMode.set($event)">
+          <option value="Any">Any</option>
+          <option value="Remote">Remote</option>
+          <option value="Hybrid">Hybrid</option>
+          <option value="Onsite">Onsite</option>
+        </select>
+      </label>
+
+      <label class="grid gap-1 md:col-span-2">
+        <span class="text-sm text-slate-200">Skills (optional)</span>
+        <textarea
+          rows="4"
+          class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-slate-100 outline-none focus:border-slate-500"
+          placeholder="e.g. Angular, TypeScript, .NET, SQL"
+          [ngModel]="skillsText()"
+          (ngModelChange)="skillsText.set($event)"></textarea>
+      </label>
+    </div>
+
+    <div *ngIf="error()" class="mt-4 rounded-lg border border-red-900/60 bg-red-950/40 p-3 text-sm text-red-200">
+      {{ error() }}
+    </div>
+
+    <div class="mt-4 flex items-center gap-3">
+      <button
+        class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+        [disabled]="loading() || !canSubmit()"
+        (click)="submit()">
+        {{ loading() ? 'Saving…' : 'Continue' }}
+      </button>
+
+      <a class="text-sm text-slate-300 underline" routerLink="/jobs">Skip for now</a>
+    </div>
+  </div>
+</div>
