@@ -122,10 +122,24 @@ cd /Users/athulkrishnagopakumar/Desktop/Aijob
 }
 ```
 
-3. **Apply database migrations**
+3. **Apply database migrations** (run from the **repo root**, not from inside `Api/`)
+
 ```bash
-dotnet ef database update --project api/src/Infrastructure/AiJobMarketIntelligence.Infrastructure --startup-project api/src/Api/AiJobMarketIntelligence.Api
+cd /Users/athulkrishnagopakumar/project/Aijob
+
+# Option A: helper script (AiJobContext + AuthDbContext)
+./scripts/apply-migrations.sh
+
+# Option B: manual (AiJobContext — jobs, preferences, skills)
+dotnet ef database update \
+  --project api/src/Infrastructure/AiJobMarketIntelligence.Infrastructure/AiJobMarketIntelligence.Infrastructure.csproj \
+  --startup-project api/src/Api/AiJobMarketIntelligence.Api/AiJobMarketIntelligence.Api.csproj \
+  --context AiJobContext
 ```
+
+If `dotnet ef` is not installed: `dotnet tool install --global dotnet-ef`
+
+**Common mistake:** from `api/src/Api/AiJobMarketIntelligence.Api`, `--project ../Infrastructure/...` resolves to `api/src/Api/Infrastructure/...` (wrong). Use the full path from repo root above, or `../../Infrastructure/...` from the Api folder.
 
 4. **Run the API**
 ```bash
