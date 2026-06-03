@@ -115,6 +115,12 @@ var openAiApiKey = builder.Configuration["OpenAI:ApiKey"]
     ?? Environment.GetEnvironmentVariable("OPENAI_API_KEY")
     ?? throw new InvalidOperationException("OpenAI API key is required. Set it via configuration or OPENAI_API_KEY environment variable.");
 
+// Ensure configuration also sees it at OpenAI:ApiKey (for other services)
+if (string.IsNullOrWhiteSpace(builder.Configuration["OpenAI:ApiKey"]))
+{
+    builder.Configuration["OpenAI:ApiKey"] = openAiApiKey;
+}
+
 builder.Services.AddSingleton<ISkillExtractionService>(sp =>
     new OpenAiSkillExtractionService(openAiApiKey, sp.GetRequiredService<ILogger<OpenAiSkillExtractionService>>()));
 

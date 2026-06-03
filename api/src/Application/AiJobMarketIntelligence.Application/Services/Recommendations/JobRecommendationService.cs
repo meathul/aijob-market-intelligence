@@ -31,7 +31,12 @@ public sealed class JobRecommendationService : IJobRecommendationService
         _prefs = prefs;
         _logger = logger;
 
-        var apiKey = config["OpenAI:ApiKey"] ?? Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+        // Prefer environment variable (matches how the rest of the app is configured via .env)
+        // Fall back to configuration key OpenAI:ApiKey if present.
+        var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY")
+            ?? config["OpenAI:ApiKey"]
+            ?? config["OPENAI_API_KEY"];
+
         if (string.IsNullOrWhiteSpace(apiKey))
             throw new InvalidOperationException("OpenAI API key is required for recommendations.");
 
