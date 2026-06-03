@@ -2,10 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 import { AuthApiService } from '../../../services/auth-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { UserPreferencesApiService } from '../../../services/user-preferences-api.service';
+import { isOnboardingComplete } from '../../../models/user/user-preferences.utils';
 
 type LoginMode = 'user' | 'admin';
 
@@ -41,9 +43,9 @@ export class LoginPageComponent {
     this.loading.set(true);
 
     try {
-      const res = await this.authApi
-        .login({ email: this.email(), password: this.password() })
-        .toPromise();
+      const res = await firstValueFrom(
+        this.authApi.login({ email: this.email(), password: this.password() })
+      );
 
       const token = res?.accessToken ?? res?.token;
       if (!token) throw new Error('Login response missing accessToken');
@@ -56,25 +58,16 @@ export class LoginPageComponent {
 
       this.auth.setAuth({ token, email: res?.email, roles });
 
-      // If user hasn't completed onboarding, send them there first.
-      this.prefsApi.get().subscribe({
-        next: async (prefs) => {
-          const hasAny = !!(
-            prefs?.location ||
-            prefs?.preferredJobTitle ||
-            prefs?.preferredSalaryMin ||
-            prefs?.preferredSalaryMax ||
-            prefs?.skillsText ||
-            prefs?.workMode
-          );
+      let prefs = null;
+      try {
+        prefs = await firstValueFrom(this.prefsApi.get());
+      } catch {
+        prefs = null;
+      }
 
-          await this.router.navigateByUrl(hasAny ? '/dashboard' : '/onboarding');
-        },
-        error: async () => {
-          // If anything fails, still continue (don't lock the user out).
-          await this.router.navigateByUrl('/dashboard');
-        }
-      });
+      await this.router.navigateByUrl(
+        isOnboardingComplete(prefs) ? '/dashboard' : '/onboarding'
+      );
     } catch (e: any) {
       this.error.set(e?.message ?? 'Login failed');
     } finally {

@@ -37,6 +37,7 @@ public sealed class UserJobPreferencesRepository : IUserJobPreferencesRepository
         existing.PreferredJobTitle = prefs.PreferredJobTitle;
         existing.WorkMode = prefs.WorkMode;
         existing.SkillsText = prefs.SkillsText;
+        existing.OnboardingCompleted = prefs.OnboardingCompleted;
         existing.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();

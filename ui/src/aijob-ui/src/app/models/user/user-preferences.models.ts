@@ -5,4 +5,5 @@ export type UserJobPreferencesDto = {
   preferredJobTitle?: string | null;
   workMode?: string | null; // Remote | Hybrid | Onsite | Any
   skillsText?: string | null;
+  onboardingCompleted?: boolean;
 };

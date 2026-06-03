@@ -1,3 +1,4 @@
+<div class="min-h-screen bg-slate-950 px-4 py-10 text-slate-100">
 <div class="mx-auto max-w-2xl">
   <h1 class="text-2xl font-semibold">Set up your job preferences</h1>
   <p class="mt-1 text-sm text-slate-300">
@@ -77,10 +78,9 @@
         class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
         [disabled]="loading() || !canSubmit()"
         (click)="submit()">
-        {{ loading() ? 'Saving…' : 'Continue' }}
+        {{ loading() ? 'Saving…' : 'Continue to dashboard' }}
       </button>
-
-      <a class="text-sm text-slate-300 underline" routerLink="/jobs">Skip for now</a>
     </div>
   </div>
+</div>
 </div>

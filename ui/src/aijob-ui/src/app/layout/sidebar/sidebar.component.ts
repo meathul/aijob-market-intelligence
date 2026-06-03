@@ -1,5 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AuthService } from '../../core/auth/auth.service';
 
@@ -17,6 +17,7 @@ type NavItem = {
 })
 export class SidebarComponent {
   private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
   readonly isAdmin = computed(() => (this.auth.state()?.roles ?? []).includes('Admin'));
 
@@ -27,7 +28,8 @@ export class SidebarComponent {
     { label: 'Salary', path: '/salary' }
   ];
 
-  logout() {
+  async logout() {
     this.auth.logout();
+    await this.router.navigateByUrl('/auth/login');
   }
 }

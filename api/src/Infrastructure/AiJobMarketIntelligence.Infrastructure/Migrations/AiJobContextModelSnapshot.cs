@@ -181,6 +181,9 @@ namespace AiJobMarketIntelligence.Infrastructure.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("varchar(300)");
 
+                    b.Property<bool>("OnboardingCompleted")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("PreferredJobTitle")
                         .HasMaxLength(200)
                         .HasColumnType("varchar(200)");

@@ -1,10 +1,14 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/guards/auth.guard';
 import { adminGuard } from './auth/guards/admin.guard';
+import { guestGuard } from './auth/guards/guest.guard';
+import { onboardingGuard } from './auth/guards/onboarding.guard';
+import { onboardingPageGuard } from './auth/guards/onboarding-page.guard';
 
 export const routes: Routes = [
   {
     path: 'auth',
+    canActivate: [guestGuard],
     children: [
       {
         path: 'login',
@@ -24,8 +28,16 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'onboarding',
+    canActivate: [authGuard, onboardingPageGuard],
+    loadComponent: () =>
+      import('./onboarding/pages/profile-setup-page/profile-setup-page.component').then(
+        (m) => m.ProfileSetupPageComponent
+      )
+  },
+  {
     path: '',
-    canActivate: [authGuard],
+    canActivate: [authGuard, onboardingGuard],
     loadComponent: () =>
       import('./layout/shell/shell.component').then((m) => m.ShellComponent),
     children: [
@@ -33,13 +45,6 @@ export const routes: Routes = [
         path: '',
         pathMatch: 'full',
         redirectTo: 'dashboard'
-      },
-      {
-        path: 'onboarding',
-        loadComponent: () =>
-          import('./onboarding/pages/profile-setup-page/profile-setup-page.component').then(
-            (m) => m.ProfileSetupPageComponent
-          )
       },
       {
         path: 'dashboard',
@@ -89,6 +94,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'dashboard'
+    redirectTo: 'auth/login'
   }
 ];

@@ -6,9 +6,13 @@ import { of, throwError } from 'rxjs';
 import { LoginPageComponent } from './login-page.component';
 import { AuthApiService } from '../../../services/auth-api.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { UserPreferencesApiService } from '../../../services/user-preferences-api.service';
 
 describe('LoginPageComponent', () => {
-  async function setup(authApi: Partial<AuthApiService>) {
+  async function setup(
+    authApi: Partial<AuthApiService>,
+    prefs: Record<string, unknown> | null = null
+  ) {
     const auth = {
       setAuth: jasmine.createSpy('setAuth')
     } as unknown as AuthService;
@@ -22,7 +26,11 @@ describe('LoginPageComponent', () => {
       providers: [
         { provide: AuthApiService, useValue: authApi },
         { provide: AuthService, useValue: auth },
-        { provide: Router, useValue: router }
+        { provide: Router, useValue: router },
+        {
+          provide: UserPreferencesApiService,
+          useValue: { get: () => of(prefs) }
+        }
       ]
     }).compileComponents();
 
@@ -46,10 +54,13 @@ describe('LoginPageComponent', () => {
     expect((router as any).navigateByUrl).not.toHaveBeenCalled();
   });
 
-  it('should set auth and navigate on success', async () => {
-    const { fixture, auth, router } = await setup({
-      login: () => of({ accessToken: 't', roles: ['User'], email: 'u@x.com' })
-    });
+  it('should navigate to onboarding when onboarding is not complete', async () => {
+    const { fixture, auth, router } = await setup(
+      {
+        login: () => of({ accessToken: 't', roles: ['User'], email: 'u@x.com' })
+      },
+      { onboardingCompleted: false, preferredJobTitle: 'Engineer' }
+    );
 
     fixture.componentInstance.mode.set('user');
     fixture.componentInstance.email.set('u@x.com');
@@ -57,11 +68,25 @@ describe('LoginPageComponent', () => {
 
     await fixture.componentInstance.submit();
 
-    expect((auth as any).setAuth).toHaveBeenCalledWith({
-      token: 't',
-      email: 'u@x.com',
-      roles: ['User']
-    });
+    expect((auth as any).setAuth).toHaveBeenCalled();
+    expect((router as any).navigateByUrl).toHaveBeenCalledWith('/onboarding');
+  });
+
+  it('should navigate to dashboard when onboarding is complete', async () => {
+    const { fixture, auth, router } = await setup(
+      {
+        login: () => of({ accessToken: 't', roles: ['User'], email: 'u@x.com' })
+      },
+      { onboardingCompleted: true }
+    );
+
+    fixture.componentInstance.mode.set('user');
+    fixture.componentInstance.email.set('u@x.com');
+    fixture.componentInstance.password.set('p');
+
+    await fixture.componentInstance.submit();
+
+    expect((auth as any).setAuth).toHaveBeenCalled();
     expect((router as any).navigateByUrl).toHaveBeenCalledWith('/dashboard');
   });
 

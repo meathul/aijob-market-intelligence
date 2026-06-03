@@ -2,8 +2,10 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 import { AuthApiService } from '../../../services/auth-api.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 type RegisterMode = 'user' | 'admin';
 
@@ -15,6 +17,7 @@ type RegisterMode = 'user' | 'admin';
 })
 export class RegisterPageComponent {
   private readonly authApi = inject(AuthApiService);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
   readonly mode = signal<RegisterMode>('user');
@@ -48,8 +51,6 @@ export class RegisterPageComponent {
       return;
     }
 
-    // NOTE: Backend currently exposes /api/Auth/register only.
-    // This creates a normal user. Admin creation usually should be server-controlled.
     if (this.mode() === 'admin') {
       this.error.set('Admin accounts must be created by an existing admin.');
       return;
@@ -57,11 +58,20 @@ export class RegisterPageComponent {
 
     this.loading.set(true);
     try {
-      await this.authApi
-        .register({ email: this.email(), password: this.password() })
-        .toPromise();
+      const res = await firstValueFrom(
+        this.authApi.register({ email: this.email(), password: this.password() })
+      );
 
-      await this.router.navigateByUrl('/auth/login');
+      const token = res?.accessToken ?? res?.token;
+      if (!token) throw new Error('Registration response missing accessToken');
+
+      this.auth.setAuth({
+        token,
+        email: res?.email ?? this.email(),
+        roles: res?.roles ?? ['User']
+      });
+
+      await this.router.navigateByUrl('/onboarding');
     } catch (e: any) {
       this.error.set(e?.message ?? 'Registration failed');
     } finally {

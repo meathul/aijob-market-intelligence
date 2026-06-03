@@ -44,9 +44,21 @@
     {{ error() }}
   </div>
 
-  <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+  <div
+    *ngIf="prefsWarning()"
+    class="rounded-xl border border-indigo-900/60 bg-indigo-950/30 p-3 text-sm text-indigo-200"
+  >
+    {{ prefsWarning() }}
+    <a routerLink="/onboarding" class="ml-2 underline">Set up profile</a>
+  </div>
+
+  <div *ngIf="mode() === 'all'" class="rounded-xl border border-slate-800 bg-slate-950 p-4">
     <app-jobs-filters (changed)="onFiltersChanged($event)" />
   </div>
+
+  <p *ngIf="mode() === 'recommended'" class="text-sm text-slate-400">
+    Ranked for your saved profile. Switch to All Jobs to use manual filters.
+  </p>
 
   <app-jobs-table [jobs]="jobs()" />
 </section>

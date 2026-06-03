@@ -7,6 +7,9 @@
           {{ row.title }}
           <span *ngIf="row.url" class="ml-2 text-xs text-slate-500">↗</span>
         </div>
+        <div *ngIf="row.matchLabel" class="mt-0.5 text-xs text-indigo-300/90">
+          {{ row.matchLabel }}
+        </div>
       </td>
     </ng-container>
 

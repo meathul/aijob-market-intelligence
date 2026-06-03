@@ -24,5 +24,10 @@ public sealed class UserJobPreferences
 
     public string? SkillsText { get; set; }
 
+    /// <summary>
+    /// Set to true only after the user finishes the profile onboarding flow.
+    /// </summary>
+    public bool OnboardingCompleted { get; set; }
+
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

@@ -1,5 +1,6 @@
 using AiJobMarketIntelligence.Application.DTOs.UserPreferences;
 using AiJobMarketIntelligence.Application.Interfaces.Repositories.UserPreferences;
+using AiJobMarketIntelligence.Application.UserPreferences;
 using AiJobMarketIntelligence.Domain.Entities.UserPreferences;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +31,9 @@ public sealed class UserPreferencesController : ControllerBase
 
         var prefs = await _repo.GetByUserIdAsync(userId);
         if (prefs is null)
-            return Ok(new UserJobPreferencesDto());
+        {
+            return Ok(new UserJobPreferencesDto { OnboardingCompleted = false });
+        }
 
         return Ok(ToDto(prefs));
     }
@@ -52,6 +55,14 @@ public sealed class UserPreferencesController : ControllerBase
             return BadRequest(new { message = "PreferredSalaryMin must be <= PreferredSalaryMax" });
         }
 
+        if (!UserJobPreferencesRules.HasMeaningfulPreferences(request))
+        {
+            return BadRequest(new
+            {
+                message = "Add at least one preference (location, job title, skills, salary range, or work mode other than Any)."
+            });
+        }
+
         var userId = User.FindFirst("sub")?.Value
             ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
@@ -67,6 +78,7 @@ public sealed class UserPreferencesController : ControllerBase
             PreferredJobTitle = request.PreferredJobTitle?.Trim(),
             WorkMode = request.WorkMode?.Trim(),
             SkillsText = request.SkillsText?.Trim(),
+            OnboardingCompleted = true,
             UpdatedAt = DateTime.UtcNow
         };
 
@@ -81,6 +93,7 @@ public sealed class UserPreferencesController : ControllerBase
         PreferredSalaryMax = x.PreferredSalaryMax,
         PreferredJobTitle = x.PreferredJobTitle,
         WorkMode = x.WorkMode,
-        SkillsText = x.SkillsText
+        SkillsText = x.SkillsText,
+        OnboardingCompleted = x.OnboardingCompleted
     };
 }

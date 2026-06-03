@@ -12,6 +12,7 @@ export type UiJob = {
   salary?: string;
   skills?: string[];
   url?: string;
+  matchLabel?: string;
 };
 
 @Component({

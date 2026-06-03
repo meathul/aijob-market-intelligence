@@ -31,7 +31,7 @@ export class JobsFiltersComponent {
   readonly state = signal<JobsFilterState>({
     query: '',
     location: 'Any',
-    remoteOnly: true
+    remoteOnly: false
   });
 
   readonly locations: JobsFilterState['location'][] = [

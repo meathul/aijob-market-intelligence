@@ -13,4 +13,6 @@ public sealed class UserJobPreferencesDto
     public string? WorkMode { get; set; } // Remote | Hybrid | Onsite | Any
 
     public string? SkillsText { get; set; }
+
+    public bool OnboardingCompleted { get; set; }
 }
