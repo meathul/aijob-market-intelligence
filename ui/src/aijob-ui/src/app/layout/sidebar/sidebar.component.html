@@ -17,6 +17,16 @@
       </a>
     }
 
+    @if (!isAdmin()) {
+      <a
+        class="block rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-slate-900 hover:text-white"
+        routerLink="/insights"
+        routerLinkActive="bg-slate-900 text-white"
+      >
+        Career Bot
+      </a>
+    }
+
     <!-- Admin-only links (rendered only if the user has Admin role) -->
     @if (isAdmin()) {
       <a
@@ -25,13 +35,6 @@
         routerLinkActive="bg-slate-900 text-white"
       >
         Reports
-      </a>
-      <a
-        class="block rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-slate-900 hover:text-white"
-        routerLink="/insights"
-        routerLinkActive="bg-slate-900 text-white"
-      >
-        AI Insights
       </a>
     }
   </nav>

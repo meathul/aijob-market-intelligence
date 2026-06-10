@@ -1,4 +1,13 @@
-/* Dark-theme overrides for Angular Material chips in the Jobs table */
+/* Dark-theme overrides for Angular Material chips in the Jobs cards */
+
+.job-card {
+  min-height: 100%;
+}
+
+.job-card h2,
+.job-card div {
+  overflow-wrap: anywhere;
+}
 
 :host ::ng-deep mat-chip-set {
   display: flex;

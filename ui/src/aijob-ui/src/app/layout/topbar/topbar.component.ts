@@ -27,7 +27,7 @@ export class TopbarComponent {
     if (u.startsWith('/skills')) return 'Skills';
     if (u.startsWith('/salary')) return 'Salary';
     if (u.startsWith('/reports')) return 'Reports';
-    if (u.startsWith('/insights')) return 'AI Insights';
+    if (u.startsWith('/insights')) return 'Career Bot';
     return 'Dashboard';
   });
 }

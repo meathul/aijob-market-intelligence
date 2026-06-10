@@ -43,10 +43,6 @@ export class JobsPageComponent implements OnInit {
   private readonly allJobs = signal<UiJob[]>([]);
 
   readonly jobs = computed(() => {
-    if (this.mode() === 'recommended') {
-      return this.allJobs();
-    }
-
     const f = this.filters();
     const q = f.query.trim().toLowerCase();
 

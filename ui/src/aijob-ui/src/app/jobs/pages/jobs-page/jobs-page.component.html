@@ -52,7 +52,7 @@
     <a routerLink="/onboarding" class="ml-2 underline">Set up profile</a>
   </div>
 
-  <div *ngIf="mode() === 'all'" class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+  <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
     <app-jobs-filters (changed)="onFiltersChanged($event)" />
   </div>
 

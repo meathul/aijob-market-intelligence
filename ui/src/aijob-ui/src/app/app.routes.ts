@@ -84,7 +84,6 @@ export const routes: Routes = [
       },
       {
         path: 'insights',
-        canActivate: [adminGuard],
         loadComponent: () =>
           import('./insights/pages/insights-page/insights-page.component').then(
             (m) => m.InsightsPageComponent

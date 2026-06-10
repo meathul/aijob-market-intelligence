@@ -1,24 +1,57 @@
-import { Component, computed, signal, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
-import { AnalyticsApiService } from '../../../services/analytics-api.service';
+import { CareerChatApiService } from '../../../services/career-chat-api.service';
+
+type ChatMessage = {
+  role: 'user' | 'bot';
+  text: string;
+};
 
 @Component({
   selector: 'app-insights-page',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, FormsModule],
   templateUrl: './insights-page.component.html',
   styleUrl: './insights-page.component.scss'
 })
 export class InsightsPageComponent {
-  private readonly analyticsApi = inject(AnalyticsApiService);
+  private readonly careerChatApi = inject(CareerChatApiService);
 
-  readonly days = signal(30);
-  readonly points = toSignal(this.analyticsApi.ingestionDaily(this.days()), {
-    initialValue: []
-  });
+  readonly draft = signal('');
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly messages = signal<ChatMessage[]>([
+    {
+      role: 'bot',
+      text: 'Hi, I am Career Bot. Ask me about resumes, interviews, salary negotiation, career paths, or which skills to build next.'
+    }
+  ]);
 
-  readonly total = computed(() =>
-    this.points().reduce((sum, p) => sum + (p.count ?? 0), 0)
-  );
+  ask() {
+    const question = this.draft().trim();
+    if (!question || this.loading()) return;
+
+    this.messages.update((prev) => [...prev, { role: 'user', text: question }]);
+    this.draft.set('');
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.careerChatApi.ask({ message: question }).subscribe({
+      next: (res) => {
+        this.messages.update((prev) => [
+          ...prev,
+          { role: 'bot', text: res.answer || 'I could not generate an answer just now.' }
+        ]);
+        this.loading.set(false);
+      },
+      error: (e) => {
+        this.loading.set(false);
+        this.error.set('Career Bot could not answer right now. Please try again.');
+        // eslint-disable-next-line no-console
+        console.error(e);
+      }
+    });
+  }
 }
