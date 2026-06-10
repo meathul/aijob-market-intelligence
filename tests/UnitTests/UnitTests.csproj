@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="../../api/src/Application/AiJobMarketIntelligence.Application/AiJobMarketIntelligence.Application.csproj" />
     <ProjectReference Include="../../api/src/Domain/AiJobMarketIntelligence.Domain/AiJobMarketIntelligence.Domain.csproj" />
+    <ProjectReference Include="../../api/src/Api/AiJobMarketIntelligence.Api/AiJobMarketIntelligence.Api.csproj" />
   </ItemGroup>
 
 </Project>
