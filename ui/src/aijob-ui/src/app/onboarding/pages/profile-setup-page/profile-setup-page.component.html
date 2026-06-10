@@ -80,6 +80,14 @@
         (click)="submit()">
         {{ loading() ? 'Saving…' : 'Continue to dashboard' }}
       </button>
+
+      <a
+        *ngIf="isExistingUser()"
+        routerLink="/dashboard"
+        class="rounded-lg border border-slate-700 hover:bg-slate-800 hover:text-white px-4 py-2 text-sm font-semibold text-slate-300 transition-all duration-150"
+      >
+        Cancel
+      </a>
     </div>
   </div>
 </div>

@@ -1,10 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject, computed } from '@angular/core';
 
 import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
+import { ApplicationsService } from '../../../services/applications.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 export type UiJob = {
+  id: number;
   title: string;
   company: string;
   location: string;
@@ -23,7 +26,12 @@ export type UiJob = {
   styleUrl: './jobs-table.component.scss'
 })
 export class JobsTableComponent {
+  private readonly appService = inject(ApplicationsService);
+  private readonly auth = inject(AuthService);
+
   @Input({ required: true }) jobs: UiJob[] = [];
+
+  readonly isAdmin = computed(() => (this.auth.state()?.roles ?? []).includes('Admin'));
 
   readonly displayedColumns: Array<keyof UiJob | 'skills'> = [
     'title',
@@ -40,5 +48,17 @@ export class JobsTableComponent {
 
     // Use noopener for safety.
     window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  apply(job: UiJob) {
+    this.appService.apply(job);
+  }
+
+  unapply(jobId: number) {
+    this.appService.unapply(jobId);
+  }
+
+  isApplied(jobId: number): boolean {
+    return this.appService.isApplied(jobId);
   }
 }

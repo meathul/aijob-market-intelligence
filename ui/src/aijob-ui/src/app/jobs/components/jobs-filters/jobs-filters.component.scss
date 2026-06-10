@@ -1,0 +1,59 @@
+/* Custom styles for range slider track and thumb */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #1e293b; /* slate-800 */
+  border-radius: 9999px;
+  height: 6px;
+  outline: none;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #6366f1; /* indigo-500 */
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+    transition: background 0.15s ease, transform 0.15s ease;
+
+    &:hover {
+      background: #818cf8; /* indigo-400 */
+      transform: scale(1.15);
+    }
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  &::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border: none;
+    border-radius: 50%;
+    background: #6366f1; /* indigo-500 */
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+    transition: background 0.15s ease, transform 0.15s ease;
+
+    &:hover {
+      background: #818cf8; /* indigo-400 */
+      transform: scale(1.15);
+    }
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%2394a3b8' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 0.75rem) 50%;
+  background-size: 1.25rem;
+  padding-right: 2.5rem !important;
+}

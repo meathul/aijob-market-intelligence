@@ -24,12 +24,19 @@ export const routes: Routes = [
             (m) => m.RegisterPageComponent
           )
       },
+      {
+        path: 'logged-out',
+        loadComponent: () =>
+          import('./auth/pages/logged-out-page/logged-out-page.component').then(
+            (m) => m.LoggedOutPageComponent
+          )
+      },
       { path: '', pathMatch: 'full', redirectTo: 'login' }
     ]
   },
   {
     path: 'onboarding',
-    canActivate: [authGuard, onboardingPageGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./onboarding/pages/profile-setup-page/profile-setup-page.component').then(
         (m) => m.ProfileSetupPageComponent

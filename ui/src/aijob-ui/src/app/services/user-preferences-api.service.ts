@@ -8,7 +8,7 @@ export class UserPreferencesApiService {
   constructor(private readonly api: ApiClient) {}
 
   get() {
-    return this.api.get<UserJobPreferencesDto>('/api/user/preferences');
+    return this.api.get<UserJobPreferencesDto>('/api/user/preferences', { _t: Date.now() });
   }
 
   upsert(body: UserJobPreferencesDto) {

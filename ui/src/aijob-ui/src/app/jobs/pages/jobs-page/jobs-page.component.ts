@@ -10,8 +10,10 @@ import { JobsTableComponent, UiJob } from '../../components/jobs-table/jobs-tabl
 import { JobsApiService } from '../../../services/jobs-api.service';
 import { JobsRecommendationsApiService } from '../../../services/jobs-recommendations-api.service';
 import { UserPreferencesApiService } from '../../../services/user-preferences-api.service';
+import { ApplicationsService } from '../../../services/applications.service';
 import { JobRawDto } from '../../../models/job.models';
 import { isOnboardingComplete } from '../../../models/user/user-preferences.utils';
+import { AuthService } from '../../../core/auth/auth.service';
 
 type RecommendationRow = {
   job: JobRawDto;
@@ -28,12 +30,19 @@ type RecommendationRow = {
 })
 export class JobsPageComponent implements OnInit {
   private readonly prefsApi = inject(UserPreferencesApiService);
+  private readonly appService = inject(ApplicationsService);
+  private readonly auth = inject(AuthService);
+  
+  readonly appliedJobs = this.appService.appliedJobs;
   readonly mode = signal<'recommended' | 'all'>('recommended');
+  readonly isAdmin = computed(() => (this.auth.state()?.roles ?? []).includes('Admin'));
 
   readonly filters = signal<JobsFilterState>({
     query: '',
     location: 'Any',
-    remoteOnly: false
+    remoteOnly: false,
+    minSalary: 0,
+    maxSalary: 250000
   });
 
   readonly loading = signal(false);
@@ -49,6 +58,19 @@ export class JobsPageComponent implements OnInit {
     return this.allJobs().filter((j) => {
       if (f.remoteOnly && !this.isRemoteLocation(j.location)) return false;
       if (f.location !== 'Any' && (j.location ?? '') !== f.location) return false;
+
+      // Filter by minSalary and maxSalary if in 'all' mode
+      if (this.mode() === 'all') {
+        if (f.minSalary > 0 || f.maxSalary < 250000) {
+          const salaryRange = this.parseSalary(j.salary);
+          if (salaryRange.min !== undefined && salaryRange.min > f.maxSalary) {
+            return false;
+          }
+          if (salaryRange.max !== undefined && salaryRange.max < f.minSalary) {
+            return false;
+          }
+        }
+      }
 
       if (!q) return true;
 
@@ -66,12 +88,81 @@ export class JobsPageComponent implements OnInit {
     });
   });
 
+  private parseSalary(salaryStr?: string): { min?: number; max?: number } {
+    if (!salaryStr) return {};
+
+    const cleaned = salaryStr.toLowerCase()
+      .replace(/,/g, '')
+      .replace(/\$/g, '')
+      .replace(/£/g, '')
+      .replace(/€/g, '')
+      .replace(/usd/g, '')
+      .replace(/gbp/g, '')
+      .replace(/eur/g, '');
+
+    const matches = cleaned.match(/\b\d+(?:[.]\d+)?k?\b/g);
+    if (!matches) return {};
+
+    const values = matches.map(m => {
+      let val = parseFloat(m);
+      if (m.endsWith('k')) {
+        val *= 1000;
+      }
+      return val;
+    });
+
+    const isHourly = salaryStr.toLowerCase().includes('hour') || salaryStr.toLowerCase().includes('hr') || salaryStr.toLowerCase().includes('/h');
+    const isDaily = salaryStr.toLowerCase().includes('day') || salaryStr.toLowerCase().includes('/d');
+
+    const multiplier = isHourly ? 2000 : (isDaily ? 260 : 1);
+
+    if (values.length === 1) {
+      let rate = values[0];
+      if (multiplier === 1) {
+        if (rate < 200) {
+          rate *= 2000;
+        } else if (rate < 2000) {
+          rate *= 260;
+        }
+      } else {
+        rate *= multiplier;
+      }
+      return { min: rate, max: rate };
+    }
+
+    if (values.length >= 2) {
+      let min = values[0];
+      let max = values[1];
+      if (multiplier === 1) {
+        if (min < 200) {
+          min *= 2000;
+          max *= 2000;
+        } else if (min < 2000) {
+          min *= 260;
+          max *= 260;
+        }
+      } else {
+        min *= multiplier;
+        max *= multiplier;
+      }
+      return { min, max };
+    }
+
+    return {};
+  }
+
   constructor(
     private readonly jobsApi: JobsApiService,
     private readonly recApi: JobsRecommendationsApiService
   ) {}
 
   ngOnInit() {
+    if (this.isAdmin()) {
+      this.mode.set('all');
+      this.refresh();
+      return;
+    }
+
     this.prefsApi.get().subscribe({
       next: (prefs) => {
         if (!isOnboardingComplete(prefs)) {
@@ -103,11 +194,15 @@ export class JobsPageComponent implements OnInit {
       this.recApi.list({ take: 20 }).subscribe({
         next: (res) => {
           const rows: RecommendationRow[] = res.jobs ?? [];
-          if (rows.length === 0 && !this.prefsWarning()) {
+          if (rows.length === 0) {
             this.prefsWarning.set(
-              'No personalized matches yet. Run the worker to process jobs or broaden your profile.'
+              'No personalized matches yet. Showing all jobs instead.'
             );
+            this.mode.set('all');
+            this.loadAll();
+            return;
           }
+
           this.allJobs.set(this.mapRecommendations(rows));
           this.loading.set(false);
         },
@@ -164,6 +259,7 @@ export class JobsPageComponent implements OnInit {
 
   private map(rows: JobRawDto[]): UiJob[] {
     return rows.map((r) => ({
+      id: r.id,
       title: r.title ?? '—',
       company: r.company ?? r.source ?? '—',
       location: r.location ?? (r.url?.includes('remote') ? 'Remote' : '—'),

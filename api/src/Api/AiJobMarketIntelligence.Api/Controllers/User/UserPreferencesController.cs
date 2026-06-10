@@ -20,6 +20,7 @@ public sealed class UserPreferencesController : ControllerBase
     }
 
     [HttpGet]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     [ProducesResponseType(typeof(UserJobPreferencesDto), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get()
     {

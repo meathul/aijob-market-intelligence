@@ -116,10 +116,14 @@ builder.Services.AddScoped<IUserJobPreferencesRepository, UserJobPreferencesRepo
 // Salary parsing + skill extraction + processing pipeline (processing runs in Worker; API reuses services for any ad-hoc processing needs)
 builder.Services.AddSingleton<ISalaryParserService, SalaryParserService>();
 
-// Register OpenAI skill extraction service
-var openAiApiKey = builder.Configuration["OpenAI:ApiKey"]
+// Register Groq/OpenAI skill extraction service
+var openAiApiKey = Environment.GetEnvironmentVariable("GROQ_API_KEY")
+    ?? builder.Configuration["GROQ_API_KEY"]
+    ?? builder.Configuration["Groq:ApiKey"]
+    ?? builder.Configuration["OpenAI:ApiKey"]
     ?? Environment.GetEnvironmentVariable("OPENAI_API_KEY")
-    ?? throw new InvalidOperationException("OpenAI API key is required. Set it via configuration or OPENAI_API_KEY environment variable.");
+    ?? builder.Configuration["OPENAI_API_KEY"]
+    ?? throw new InvalidOperationException("API key is required. Set it via GROQ_API_KEY or OPENAI_API_KEY environment variable.");
 
 // Ensure configuration also sees it at OpenAI:ApiKey (for other services)
 if (string.IsNullOrWhiteSpace(builder.Configuration["OpenAI:ApiKey"]))

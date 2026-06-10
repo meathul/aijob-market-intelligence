@@ -23,13 +23,13 @@ builder.Configuration.AddEnvironmentVariables();
 {
     var dotenvMissing = Environment.GetEnvironmentVariable("AIJOB_DOTENV_NOT_FOUND") == "1";
     var apiKeyPresent = !string.IsNullOrWhiteSpace(
-        builder.Configuration["OPENAI_API_KEY"] ?? Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
+        Environment.GetEnvironmentVariable("GROQ_API_KEY") ?? builder.Configuration["GROQ_API_KEY"] ?? builder.Configuration["OPENAI_API_KEY"] ?? Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
 
     if (dotenvMissing)
         builder.Logging.AddConsole();
 
     var logger = LoggerFactory.Create(lb => lb.AddConsole()).CreateLogger("WorkerStartup");
-    logger.LogInformation(".env loaded: {DotEnvLoaded}; OPENAI_API_KEY present: {OpenAiKeyPresent}", !dotenvMissing, apiKeyPresent);
+    logger.LogInformation(".env loaded: {DotEnvLoaded}; API_KEY present: {OpenAiKeyPresent}", !dotenvMissing, apiKeyPresent);
 }
 
 // Configure Entity Framework Core with MySQL
@@ -54,11 +54,14 @@ builder.Services.AddScoped<IJobProcessedRepository, JobProcessedRepository>();
 // Salary parsing + skill extraction + processing pipeline
 builder.Services.AddSingleton<ISalaryParserService, SalaryParserService>();
 
-// Register OpenAI skill extraction service
-var openAiApiKey = builder.Configuration["OPENAI_API_KEY"]
+// Register Groq/OpenAI skill extraction service
+var openAiApiKey = Environment.GetEnvironmentVariable("GROQ_API_KEY")
+    ?? builder.Configuration["GROQ_API_KEY"]
+    ?? builder.Configuration["Groq:ApiKey"]
     ?? builder.Configuration["OpenAI:ApiKey"]
     ?? Environment.GetEnvironmentVariable("OPENAI_API_KEY")
-    ?? throw new InvalidOperationException("OpenAI API key is required. Set it via configuration or OPENAI_API_KEY environment variable.");
+    ?? builder.Configuration["OPENAI_API_KEY"]
+    ?? throw new InvalidOperationException("API key is required. Set it via GROQ_API_KEY or OPENAI_API_KEY environment variable.");
 
 builder.Services.AddSingleton<ISkillExtractionService>(sp =>
     new OpenAiSkillExtractionService(openAiApiKey, sp.GetRequiredService<ILogger<OpenAiSkillExtractionService>>()));

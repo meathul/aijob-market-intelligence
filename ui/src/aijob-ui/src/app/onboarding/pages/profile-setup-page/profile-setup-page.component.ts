@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
@@ -12,7 +12,7 @@ import { hasMeaningfulJobPreferences } from '../../../models/user/user-preferenc
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './profile-setup-page.component.html'
 })
-export class ProfileSetupPageComponent {
+export class ProfileSetupPageComponent implements OnInit {
   private readonly prefsApi = inject(UserPreferencesApiService);
   private readonly router = inject(Router);
 
@@ -25,6 +25,30 @@ export class ProfileSetupPageComponent {
 
   readonly error = signal<string | null>(null);
   readonly loading = signal(false);
+  readonly isExistingUser = signal(false);
+
+  ngOnInit() {
+    this.loading.set(true);
+    this.prefsApi.get().subscribe({
+      next: (prefs) => {
+        this.loading.set(false);
+        if (prefs) {
+          this.isExistingUser.set(prefs.onboardingCompleted ?? false);
+          this.location.set(prefs.location || '');
+          this.preferredJobTitle.set(prefs.preferredJobTitle || '');
+          this.preferredSalaryMin.set(prefs.preferredSalaryMin ?? null);
+          this.preferredSalaryMax.set(prefs.preferredSalaryMax ?? null);
+          this.workMode.set(prefs.workMode as any ?? 'Any');
+          this.skillsText.set(prefs.skillsText || '');
+        }
+      },
+      error: (e) => {
+        this.loading.set(false);
+        // Clean error display but log to console
+        console.error('Failed to load existing preferences:', e);
+      }
+    });
+  }
 
   readonly canSubmit = computed(() => {
     const min = this.preferredSalaryMin();

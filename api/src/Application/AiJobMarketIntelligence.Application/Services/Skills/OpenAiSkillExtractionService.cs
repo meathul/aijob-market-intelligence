@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using OpenAI;
 using OpenAI.Chat;
 
 namespace AiJobMarketIntelligence.Application.Services.Skills;
@@ -23,7 +24,8 @@ public class OpenAiSkillExtractionService : ISkillExtractionService
             throw new ArgumentNullException(nameof(apiKey), "OpenAI API key is required");
         }
 
-        _chatClient = new ChatClient("gpt-4o-mini", apiKey);
+        var options = new OpenAIClientOptions { Endpoint = new Uri("https://api.groq.com/openai/v1") };
+        _chatClient = new OpenAIClient(new System.ClientModel.ApiKeyCredential(apiKey), options).GetChatClient("llama-3.1-8b-instant");
         _logger = logger;
     }
 
@@ -68,24 +70,24 @@ Be thorough but return only legitimate technical skills that are clearly mention
 
             var userPrompt = $"Extract technical skills from this job posting:\n\n{combinedText}";
 
-            // Call OpenAI API
+            // Call Groq API
             var messages = new List<ChatMessage>
             {
                 new SystemChatMessage(systemPrompt),
                 new UserChatMessage(userPrompt)
             };
 
-            _logger.LogInformation("Calling OpenAI ChatGPT for skill extraction");
+            _logger.LogInformation("Calling Groq Llama for skill extraction");
             var response = await _chatClient.CompleteChatAsync(messages);
 
             // Parse the response
             var skillsText = response.Value.Content[0].Text ?? string.Empty;
-            _logger.LogDebug("OpenAI Response: {Response}", skillsText);
+            _logger.LogDebug("Groq Response: {Response}", skillsText);
 
             // Filter out common non-skill/policy/boilerplate responses
             if (IsNonSkillResponse(skillsText))
             {
-                _logger.LogInformation("OpenAI returned a non-skill response; ignoring.");
+                _logger.LogInformation("Groq returned a non-skill response; ignoring.");
                 return new List<string>();
             }
 

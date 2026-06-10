@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
@@ -11,7 +12,7 @@ type NavItem = {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
@@ -20,6 +21,7 @@ export class SidebarComponent {
   private readonly router = inject(Router);
 
   readonly isAdmin = computed(() => (this.auth.state()?.roles ?? []).includes('Admin'));
+  readonly email = computed(() => this.auth.state()?.email ?? 'user@local');
 
   readonly nav: NavItem[] = [
     { label: 'Dashboard', path: '/dashboard' },
@@ -29,6 +31,11 @@ export class SidebarComponent {
   ];
 
   async logout() {
+    this.auth.logout();
+    await this.router.navigateByUrl('/auth/logged-out');
+  }
+
+  async switchAccount() {
     this.auth.logout();
     await this.router.navigateByUrl('/auth/login');
   }

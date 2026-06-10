@@ -8,6 +8,7 @@ using AiJobMarketIntelligence.Domain.Entities;
 using AiJobMarketIntelligence.Domain.Entities.UserPreferences;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using OpenAI;
 using OpenAI.Chat;
 
 namespace AiJobMarketIntelligence.Application.Services.Recommendations;
@@ -36,19 +37,23 @@ public sealed class JobRecommendationService : IJobRecommendationService
         _prefs = prefs;
         _logger = logger;
 
-        var apiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY")
+        var apiKey = Environment.GetEnvironmentVariable("GROQ_API_KEY")
+            ?? config["GROQ_API_KEY"]
+            ?? config["Groq:ApiKey"]
+            ?? Environment.GetEnvironmentVariable("OPENAI_API_KEY")
             ?? config["OpenAI:ApiKey"]
             ?? config["OPENAI_API_KEY"];
 
         if (string.IsNullOrWhiteSpace(apiKey))
         {
             _aiEnabled = false;
-            _logger.LogWarning("OPENAI_API_KEY is not set; recommendations will use profile-based scoring only.");
+            _logger.LogWarning("GROQ_API_KEY/OPENAI_API_KEY is not set; recommendations will use profile-based scoring only.");
         }
         else
         {
             _aiEnabled = true;
-            _chat = new ChatClient("gpt-4o-mini", apiKey);
+            var options = new OpenAIClientOptions { Endpoint = new Uri("https://api.groq.com/openai/v1") };
+            _chat = new OpenAIClient(new System.ClientModel.ApiKeyCredential(apiKey), options).GetChatClient("llama-3.1-8b-instant");
         }
     }
 

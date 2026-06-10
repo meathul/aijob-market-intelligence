@@ -21,6 +21,7 @@ import { UserJobPreferencesDto } from '../../../models/user/user-preferences.mod
 import { isOnboardingComplete } from '../../../models/user/user-preferences.utils';
 import { JobsRecommendationsApiService } from '../../../services/jobs-recommendations-api.service';
 import { UserPreferencesApiService } from '../../../services/user-preferences-api.service';
+import { ApplicationsService } from '../../../services/applications.service';
 
 export type JobsTrendChartOptions = {
   series: ApexAxisChartSeries;
@@ -61,7 +62,9 @@ export class DashboardPageComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly prefsApi = inject(UserPreferencesApiService);
   private readonly recApi = inject(JobsRecommendationsApiService);
+  private readonly appService = inject(ApplicationsService);
 
+  readonly appliedJobs = this.appService.appliedJobs;
   readonly isAdmin = computed(() => (this.auth.state()?.roles ?? []).includes('Admin'));
   readonly userEmail = computed(() => this.auth.state()?.email ?? 'Your profile');
 
@@ -212,5 +215,9 @@ export class DashboardPageComponent implements OnInit {
       score: typeof row.score === 'number' ? Math.round(row.score * 100) : undefined,
       reason: row.reason ?? null
     };
+  }
+
+  unapply(jobId: number) {
+    this.appService.unapply(jobId);
   }
 }

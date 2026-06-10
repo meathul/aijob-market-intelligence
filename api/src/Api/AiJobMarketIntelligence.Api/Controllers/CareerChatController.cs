@@ -37,6 +37,6 @@ public sealed class CareerChatController : ControllerBase
         if (string.IsNullOrWhiteSpace(userId))
             return Unauthorized();
 
-        return Ok(await _careerChat.AskAsync(userId, message));
+        return Ok(await _careerChat.AskAsync(userId, message, request.History));
     }
 }

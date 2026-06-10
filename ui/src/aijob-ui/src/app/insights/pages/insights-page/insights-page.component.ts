@@ -33,12 +33,20 @@ export class InsightsPageComponent {
     const question = this.draft().trim();
     if (!question || this.loading()) return;
 
+    // Map existing conversation history (excluding the generic welcome message)
+    const history = this.messages()
+      .filter((m) => m.role === 'user' || (m.role === 'bot' && !m.text.startsWith('Hi, I am Career Bot')))
+      .map((m) => ({
+        role: m.role === 'bot' ? ('assistant' as const) : ('user' as const),
+        content: m.text
+      }));
+
     this.messages.update((prev) => [...prev, { role: 'user', text: question }]);
     this.draft.set('');
     this.loading.set(true);
     this.error.set(null);
 
-    this.careerChatApi.ask({ message: question }).subscribe({
+    this.careerChatApi.ask({ message: question, history }).subscribe({
       next: (res) => {
         this.messages.update((prev) => [
           ...prev,

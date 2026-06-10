@@ -1,155 +1,316 @@
-<p>salary-page works!</p>
-<section class="space-y-4">
-  <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+<section class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
     <div>
-      <h1 class="text-xl font-semibold">Salary</h1>
+      <h1 class="text-xl font-semibold text-slate-100">Salary Insights</h1>
       <p class="mt-1 text-sm text-slate-400">
-        Explore salary stats by time window, location and experience.
+        Explore salary averages, ranges, and remote pay benchmarks.
       </p>
     </div>
 
-    <button
-      type="button"
-      class="rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-200 hover:bg-slate-900"
-      (click)="clearFilters()"
-    >
-      Clear filters
-    </button>
-  </div>
-
-  <!-- Filters (simple HTML controls, styled with Tailwind) -->
-  <div class="grid grid-cols-1 gap-3 rounded-xl border border-slate-800 bg-slate-950 p-4 md:grid-cols-12">
-    <div class="md:col-span-3">
-      <label class="text-xs text-slate-400">Currency</label>
-      <input
-        class="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-indigo-500"
-        [value]="currency()"
-        (input)="currency.set(($any($event.target).value || '').toUpperCase())"
-        placeholder="USD"
-      />
-    </div>
-
-    <div class="md:col-span-5">
-      <label class="text-xs text-slate-400">Location</label>
-      <input
-        class="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-indigo-500"
-        [value]="location()"
-        (input)="location.set($any($event.target).value)"
-        placeholder="Remote, New York, Bangalore..."
-      />
-    </div>
-
-    <div class="md:col-span-4">
-      <label class="text-xs text-slate-400">Experience level</label>
-      <input
-        class="mt-1 w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-indigo-500"
-        [value]="experienceLevel()"
-        (input)="experienceLevel.set($any($event.target).value)"
-        placeholder="Junior / Mid / Senior"
-      />
-    </div>
-
-    <div class="md:col-span-12">
-      <label class="text-xs text-slate-400">Time window</label>
-      <div class="mt-2 flex flex-wrap gap-2">
-        @for (r of ranges; track r.days) {
-          <button
-            type="button"
-            class="rounded-full border border-slate-800 px-3 py-1 text-sm"
-            [class.bg-indigo-600]="range().days === r.days"
-            [class.text-white]="range().days === r.days"
-            [class.bg-slate-900]="range().days !== r.days"
-            [class.text-slate-200]="range().days !== r.days"
-            (click)="setRange(r.days)"
-          >
-            {{ r.label }}
-          </button>
-        }
-      </div>
+    <!-- Date Range Group -->
+    <div class="flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-950 p-1">
+      @for (r of ranges; track r.days) {
+        <button
+          type="button"
+          (click)="setRange(r.days)"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition"
+          [class.bg-slate-800]="range().days === r.days"
+          [class.text-slate-100]="range().days === r.days"
+          [class.text-slate-400]="range().days !== r.days"
+          [class.hover:text-slate-200]="range().days !== r.days"
+        >
+          {{ r.label }}
+        </button>
+      }
     </div>
   </div>
 
-  <!-- Primary KPI cards -->
-  <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-    <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
-      <div class="text-xs text-slate-400">Min</div>
-      <div class="mt-1 text-2xl font-semibold text-slate-100">
-        {{ formatMoney(stats()?.min) }}
-        <span class="text-sm font-medium text-slate-400">{{ stats()?.currency ?? currency() }}</span>
+  <!-- Filters Panel -->
+  <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+    <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-4 items-end">
+      <!-- Currency select -->
+      <div>
+        <label for="currency-select" class="block text-xs uppercase text-slate-500 font-semibold mb-1.5">Currency</label>
+        <select
+          id="currency-select"
+          [ngModel]="currency()"
+          (ngModelChange)="currency.set($event)"
+          class="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        >
+          @for (curr of currencies; track curr) {
+            <option [value]="curr">{{ curr }}</option>
+          }
+        </select>
       </div>
-    </div>
 
-    <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
-      <div class="text-xs text-slate-400">Average</div>
-      <div class="mt-1 text-2xl font-semibold text-slate-100">
-        {{ formatMoney(stats()?.avg) }}
-        <span class="text-sm font-medium text-slate-400">{{ stats()?.currency ?? currency() }}</span>
+      <!-- Experience Level select -->
+      <div>
+        <label for="exp-select" class="block text-xs uppercase text-slate-500 font-semibold mb-1.5">Experience Level</label>
+        <select
+          id="exp-select"
+          [ngModel]="experienceLevel()"
+          (ngModelChange)="experienceLevel.set($event)"
+          class="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        >
+          <option value="">Any level</option>
+          @for (exp of experienceLevels; track exp) {
+            <option [value]="exp">{{ exp }}</option>
+          }
+        </select>
       </div>
-    </div>
 
-    <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
-      <div class="text-xs text-slate-400">Max</div>
-      <div class="mt-1 text-2xl font-semibold text-slate-100">
-        {{ formatMoney(stats()?.max) }}
-        <span class="text-sm font-medium text-slate-400">{{ stats()?.currency ?? currency() }}</span>
+      <!-- Location Input -->
+      <div>
+        <label for="location-input" class="block text-xs uppercase text-slate-500 font-semibold mb-1.5">Location</label>
+        <input
+          id="location-input"
+          type="text"
+          [ngModel]="location()"
+          (ngModelChange)="location.set($event)"
+          placeholder="e.g. Remote, New York"
+          class="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        />
+      </div>
+
+      <!-- Clear Button -->
+      <div>
+        <button
+          type="button"
+          (click)="clearFilters()"
+          [disabled]="!location() && !experienceLevel()"
+          class="w-full rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-400 transition hover:bg-slate-800 hover:text-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Clear Filters
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Comparison panels -->
-  <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
-    <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
-      <div class="flex items-center justify-between">
-        <div class="text-sm font-medium text-slate-100">Remote (location = Remote)</div>
-        <div class="text-xs text-slate-400">Avg: {{ formatMoney(remoteStats()?.avg) }}</div>
-      </div>
-      <div class="mt-3 grid grid-cols-3 gap-3 text-sm">
-        <div class="rounded-lg border border-slate-800 bg-slate-900 p-3">
-          <div class="text-xs text-slate-400">Min</div>
-          <div class="font-semibold text-slate-100">{{ formatMoney(remoteStats()?.min) }}</div>
-        </div>
-        <div class="rounded-lg border border-slate-800 bg-slate-900 p-3">
-          <div class="text-xs text-slate-400">Avg</div>
-          <div class="font-semibold text-slate-100">{{ formatMoney(remoteStats()?.avg) }}</div>
-        </div>
-        <div class="rounded-lg border border-slate-800 bg-slate-900 p-3">
-          <div class="text-xs text-slate-400">Max</div>
-          <div class="font-semibold text-slate-100">{{ formatMoney(remoteStats()?.max) }}</div>
-        </div>
-      </div>
-      <div class="mt-3 text-xs text-slate-500">
-        Note: this comparison depends on your backend location labels.
-      </div>
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-12 text-center text-sm text-slate-500 flex flex-col items-center justify-center gap-3">
+      <div class="h-6 w-6 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent"></div>
+      <span>Fetching salary intelligence data...</span>
     </div>
+  } @else {
+    <!-- Main Content Dashboard -->
+    @if (stats() && stats()?.avg) {
+      <div class="space-y-6">
+        
+        <!-- Profile Alignment Match Widget -->
+        <div *ngIf="userPrefs() && (userPrefs()?.preferredSalaryMin || userPrefs()?.preferredSalaryMax)" 
+             class="rounded-xl border border-indigo-950/60 bg-indigo-950/15 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h4 class="text-sm font-semibold text-indigo-300">Profile Target Match</h4>
+            <p class="text-xs text-slate-400 mt-1">
+              Comparing market average of <span class="text-slate-200 font-semibold">{{ currency() }} {{ formatMoney(stats()?.avg) }}</span> against your onboarding preference:
+              <span class="text-slate-200 font-semibold">
+                {{ userPrefs()?.preferredSalaryMin ? (currency() + ' ' + formatMoney(userPrefs()?.preferredSalaryMin)) : 'Any min' }} -
+                {{ userPrefs()?.preferredSalaryMax ? (currency() + ' ' + formatMoney(userPrefs()?.preferredSalaryMax)) : 'Any max' }}
+              </span>.
+            </p>
+          </div>
+          <div class="shrink-0 flex items-center">
+            <span class="rounded-full px-3 py-1 text-xs font-semibold border"
+                  [ngClass]="getAlignmentStatus().status === 'aligned' 
+                    ? 'bg-emerald-950/40 text-emerald-400 border-emerald-500/20' 
+                    : 'bg-amber-950/40 text-amber-400 border-amber-500/20'">
+              {{ getAlignmentStatus().label }}
+            </span>
+          </div>
+        </div>
 
-    <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
-      <div class="flex items-center justify-between">
-        <div class="text-sm font-medium text-slate-100">Onsite (location = Onsite)</div>
-        <div class="text-xs text-slate-400">Avg: {{ formatMoney(onSiteStats()?.avg) }}</div>
-      </div>
-      <div class="mt-3 grid grid-cols-3 gap-3 text-sm">
-        <div class="rounded-lg border border-slate-800 bg-slate-900 p-3">
-          <div class="text-xs text-slate-400">Min</div>
-          <div class="font-semibold text-slate-100">{{ formatMoney(onSiteStats()?.min) }}</div>
-        </div>
-        <div class="rounded-lg border border-slate-800 bg-slate-900 p-3">
-          <div class="text-xs text-slate-400">Avg</div>
-          <div class="font-semibold text-slate-100">{{ formatMoney(onSiteStats()?.avg) }}</div>
-        </div>
-        <div class="rounded-lg border border-slate-800 bg-slate-900 p-3">
-          <div class="text-xs text-slate-400">Max</div>
-          <div class="font-semibold text-slate-100">{{ formatMoney(onSiteStats()?.max) }}</div>
-        </div>
-      </div>
-      <div class="mt-3 text-xs text-slate-500">
-        If your DB uses different labels (e.g. "Hybrid"), we can adjust these.
-      </div>
-    </div>
-  </div>
+        <!-- KPI Row -->
+        <div class="grid gap-4 sm:grid-cols-3">
+          <!-- Average Card -->
+          <div class="relative overflow-hidden rounded-xl border border-slate-800 bg-slate-950 p-6 shadow-xl">
+            <div class="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-indigo-500/10 blur-xl"></div>
+            <div class="text-xs font-semibold uppercase tracking-wider text-indigo-400">Average Salary</div>
+            <div class="mt-4 flex items-baseline gap-2">
+              <span class="text-3xl font-bold text-slate-50">{{ currency() }}</span>
+              <span class="text-4xl font-extrabold text-slate-50 tracking-tight">
+                {{ formatMoney(stats()?.avg) }}
+              </span>
+            </div>
+            <p class="mt-2 text-xs text-slate-500">Based on matching database records</p>
+          </div>
 
-  @if (!hasData()) {
-    <div class="rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm text-slate-400">
-      No salary data available for the chosen filters.
-    </div>
+          <!-- Minimum Card -->
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-6">
+            <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Minimum Salary</div>
+            <div class="mt-4 flex items-baseline gap-2">
+              <span class="text-2xl font-bold text-slate-200">{{ currency() }}</span>
+              <span class="text-3xl font-bold text-slate-200">
+                {{ formatMoney(stats()?.min) }}
+              </span>
+            </div>
+            <p class="mt-2 text-xs text-slate-500">Lowest reported data point</p>
+          </div>
+
+          <!-- Maximum Card -->
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-6">
+            <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">Maximum Salary</div>
+            <div class="mt-4 flex items-baseline gap-2">
+              <span class="text-2xl font-bold text-slate-200">{{ currency() }}</span>
+              <span class="text-3xl font-bold text-slate-200">
+                {{ formatMoney(stats()?.max) }}
+              </span>
+            </div>
+            <p class="mt-2 text-xs text-slate-500">Highest reported data point</p>
+          </div>
+        </div>
+
+        <!-- Salary Distribution Visualizer -->
+        <div class="rounded-xl border border-slate-800 bg-slate-950 p-6">
+          <h3 class="text-sm font-semibold text-slate-200 mb-4">Salary Range Visualizer</h3>
+          <div class="relative h-2.5 w-full rounded-full bg-slate-900 border border-slate-800">
+            <!-- Pointer for Average -->
+            <div
+              class="absolute top-1/2 h-5.5 w-5.5 -translate-y-1/2 rounded-full border-2 border-slate-950 bg-indigo-500 shadow-md shadow-indigo-500/20 transition-all duration-300"
+              [style.left.%]="rangePct()"
+              [title]="'Average Position: ' + rangePct() + '%'"
+            ></div>
+          </div>
+          <div class="mt-4 flex justify-between text-xs text-slate-400">
+            <span>Minimum: <strong class="text-slate-200">{{ currency() }} {{ formatMoney(stats()?.min) }}</strong></span>
+            <span class="text-indigo-400 font-semibold text-center">Average: {{ currency() }} {{ formatMoney(stats()?.avg) }}</span>
+            <span>Maximum: <strong class="text-slate-200">{{ currency() }} {{ formatMoney(stats()?.max) }}</strong></span>
+          </div>
+        </div>
+
+        <!-- Experience Benchmarks Row -->
+        <div class="grid gap-6 lg:grid-cols-2">
+          <!-- Benchmarks Grid -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-semibold text-slate-200">Experience Benchmarks</h3>
+              <span class="text-xs text-slate-500">Filter-scoped</span>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              @for (level of ['Junior', 'Mid', 'Senior', 'Lead']; track level) {
+                <div class="rounded-xl border border-slate-800 bg-slate-950 p-4">
+                  <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">{{ level }}</div>
+                  @if (getBenchmark(level)) {
+                    <div class="mt-3 text-xl font-bold text-slate-100">
+                      {{ currency() }} {{ formatMoney(getBenchmark(level)?.avg) }}
+                    </div>
+                    <div class="mt-1 text-xs text-slate-500">
+                      Range: {{ formatMoney(getBenchmark(level)?.min) }} - {{ formatMoney(getBenchmark(level)?.max) }}
+                    </div>
+                  } @else {
+                    <div class="mt-3 text-sm text-slate-600 italic">No market data points</div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Benchmarks Chart -->
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-5">
+            <div class="mb-4">
+              <h3 class="text-sm font-semibold text-slate-200">Experience Benchmarks Chart</h3>
+              <p class="text-xs text-slate-500 mt-1">Average salary compared across roles</p>
+            </div>
+            <div class="overflow-hidden rounded-lg bg-slate-900/30 p-2">
+              <apx-chart
+                [series]="chartOptions().series"
+                [chart]="chartOptions().chart"
+                [xaxis]="chartOptions().xaxis"
+                [yaxis]="chartOptions().yaxis"
+                [colors]="chartOptions().colors"
+                [dataLabels]="chartOptions().dataLabels"
+                [tooltip]="chartOptions().tooltip"
+                [grid]="chartOptions().grid"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison Sections -->
+        <div class="grid gap-6 md:grid-cols-2">
+          <!-- Remote Stats -->
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-5">
+            <div class="mb-4 flex items-center justify-between border-b border-slate-800 pb-3">
+              <div class="flex items-center gap-2">
+                <span class="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                <h3 class="text-sm font-semibold text-slate-200">Remote Benchmark</h3>
+              </div>
+              <span class="text-xs font-medium text-slate-500">Global</span>
+            </div>
+
+            @if (remoteStats() && remoteStats()?.avg) {
+              <div class="space-y-4">
+                <div class="flex justify-between items-baseline">
+                  <span class="text-xs text-slate-400 uppercase">Average</span>
+                  <span class="text-lg font-bold text-slate-100">{{ currency() }} {{ formatMoney(remoteStats()?.avg) }}</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                  <span class="text-xs text-slate-400 uppercase">Range</span>
+                  <span class="text-sm text-slate-300">
+                    {{ currency() }} {{ formatMoney(remoteStats()?.min) }} - {{ formatMoney(remoteStats()?.max) }}
+                  </span>
+                </div>
+              </div>
+            } @else {
+              <div class="py-4 text-center text-xs text-slate-500">
+                No remote salary metrics recorded for {{ currency() }}.
+              </div>
+            }
+          </div>
+
+          <!-- On-Site Stats -->
+          <div class="rounded-xl border border-slate-800 bg-slate-950 p-5">
+            <div class="mb-4 flex items-center justify-between border-b border-slate-800 pb-3">
+              <div class="flex items-center gap-2">
+                <span class="inline-flex h-2.5 w-2.5 rounded-full bg-indigo-500"></span>
+                <h3 class="text-sm font-semibold text-slate-200">Onsite / Location-Bound</h3>
+              </div>
+              <span class="text-xs font-medium text-slate-500">Global</span>
+            </div>
+
+            @if (onSiteStats() && onSiteStats()?.avg) {
+              <div class="space-y-4">
+                <div class="flex justify-between items-baseline">
+                  <span class="text-xs text-slate-400 uppercase">Average</span>
+                  <span class="text-lg font-bold text-slate-100">{{ currency() }} {{ formatMoney(onSiteStats()?.avg) }}</span>
+                </div>
+                <div class="flex justify-between items-baseline">
+                  <span class="text-xs text-slate-400 uppercase">Range</span>
+                  <span class="text-sm text-slate-300">
+                    {{ currency() }} {{ formatMoney(onSiteStats()?.min) }} - {{ formatMoney(onSiteStats()?.max) }}
+                  </span>
+                </div>
+              </div>
+            } @else {
+              <div class="py-4 text-center text-xs text-slate-500">
+                No onsite salary metrics recorded for {{ currency() }}.
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    } @else {
+      <!-- Empty Filter State -->
+      <div class="rounded-xl border border-slate-800 bg-slate-950/40 p-8 text-center">
+        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 border border-slate-800 text-slate-400 text-lg">
+          🔍
+        </div>
+        <h3 class="mt-4 text-sm font-semibold text-slate-200">No salary data found</h3>
+        <p class="mt-1 text-xs text-slate-500">
+          No salaries match currency <span class="text-slate-300 font-semibold">{{ currency() }}</span>
+          @if (experienceLevel()) { with experience <span class="text-slate-300 font-semibold">{{ experienceLevel() }}</span> }
+          @if (location()) { in <span class="text-slate-300 font-semibold">{{ location() }}</span> }.
+        </p>
+        <button
+          type="button"
+          (click)="clearFilters()"
+          class="mt-4 inline-flex items-center rounded-lg bg-indigo-600/90 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500"
+        >
+          Reset filters
+        </button>
+      </div>
+    }
   }
 </section>
