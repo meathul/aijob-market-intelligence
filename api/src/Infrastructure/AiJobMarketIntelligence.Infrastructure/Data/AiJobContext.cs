@@ -24,6 +24,8 @@ public class AiJobContext : DbContext
 
     public DbSet<UserJobPreferences> UserJobPreferences { get; set; }
 
+    public DbSet<JobApplication> JobApplications { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -205,6 +207,34 @@ public class AiJobContext : DbContext
                 .IsRequired()
                 .HasColumnType("timestamp")
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        });
+
+        // Configure JobApplication entity
+        modelBuilder.Entity<JobApplication>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.UserId)
+                .IsRequired()
+                .HasMaxLength(450);
+
+            entity.Property(e => e.JobRawId)
+                .IsRequired();
+
+            // Prevent duplicate applications per user/job
+            entity.HasIndex(e => new { e.UserId, e.JobRawId })
+                .IsUnique()
+                .HasDatabaseName("IX_JobApplications_UserId_JobRawId_Unique");
+
+            entity.Property(e => e.AppliedAt)
+                .IsRequired()
+                .HasColumnType("timestamp")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            entity.HasOne(e => e.JobRaw)
+                .WithMany()
+                .HasForeignKey(e => e.JobRawId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

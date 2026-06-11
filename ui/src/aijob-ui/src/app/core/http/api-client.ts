@@ -21,6 +21,10 @@ export class ApiClient {
     return this.http.put<T>(this.url(path), body);
   }
 
+  delete<T>(path: string) {
+    return this.http.delete<T>(this.url(path));
+  }
+
   private url(path: string) {
     const base = environment.apiBaseUrl?.replace(/\/$/, '') ?? '';
     const p = path.startsWith('/') ? path : `/${path}`;

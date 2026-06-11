@@ -112,6 +112,7 @@ builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<ISkillRepository, SkillRepository>();
 builder.Services.AddScoped<IJobProcessedRepository, JobProcessedRepository>();
 builder.Services.AddScoped<IUserJobPreferencesRepository, UserJobPreferencesRepository>();
+builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
 
 // Salary parsing + skill extraction + processing pipeline (processing runs in Worker; API reuses services for any ad-hoc processing needs)
 builder.Services.AddSingleton<ISalaryParserService, SalaryParserService>();

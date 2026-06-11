@@ -1,1 +1,14 @@
-<router-outlet />
+<div class="relative min-h-dvh">
+  <!-- WebGL Animated Background Shader -->
+  <om-dark-veil 
+    class="fixed inset-0 -z-20 block w-full h-full"
+    [noiseIntensity]="0.03"
+    [scanlineIntensity]="0.01"
+    [warpAmount]="0.005">
+  </om-dark-veil>
+  
+  <!-- Premium Dark Gradient Overlay to dim the animation and smooth out the transitions -->
+  <div class="fixed inset-0 -z-10 bg-gradient-to-b from-slate-950/75 via-slate-950/90 to-slate-950 pointer-events-none"></div>
+
+  <router-outlet></router-outlet>
+</div>

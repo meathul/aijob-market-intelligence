@@ -47,6 +47,8 @@ Welcome to the official documentation directory for the AI Job Market Intelligen
 ---
 
 ## 📑 Project Context & References
+- **[Codebase Architecture & Code Review Guide](file:///Users/athulkrishnagopakumar/project/Aijob/docs/CODEBASE_REVIEW.md)**  
+  A complete mapping and walkthrough of all backend C# projects, repositories, services, controllers, and frontend Angular pages, component hierarchies, and tests.
 - **[Project Summary](file:///Users/athulkrishnagopakumar/project/Aijob/docs/PROJECT_SUMMARY.md)**  
   A summary of the product's vision, active modules, and target customer personas.
 - **[Quick Reference Guide](file:///Users/athulkrishnagopakumar/project/Aijob/docs/QUICK_REFERENCE.md)**  
